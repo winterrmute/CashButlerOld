@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">CashButler</string>
+
+    <!-- Budget -->
+    <string name="budget_category">Budget</string>
+    <string name="budget_income">Income</string>
+    <string name="budget_investments">Investments</string>
+    <string name="budget_rental_income">Rental Income</string>
+
+    <!-- Expenses -->
+    <string name="expenses_category">Expenses</string>
+    <string name="expenses_housing">Housing</string>
+    <string name="expenses_utilities">Utilities</string>
+    <string name="expenses_transportation">Transportation</string>
+    <string name="expenses_groceries">Groceries</string>
+    <string name="expenses_dining_out">Dining out</string>
+    <string name="expenses_entertainment">Entertainment</string>
+
+    <!-- FINANCE -->
+    <string name="finance_record_title">Title</string>
+    <string name="finance_record_amount">amount</string>
+
+    <!-- BUTTON_LABEL -->
+    <string name="button_add">ADD</string>
+    <string name="button_save">SAVE</string>
+    <string name="button_cancel">CANCEL</string>
+</resources>
