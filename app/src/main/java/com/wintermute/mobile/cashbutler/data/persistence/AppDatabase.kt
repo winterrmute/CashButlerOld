@@ -12,7 +12,7 @@ import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
  *
  * @author k.kosinski
  */
-@Database(entities = [FinancialCategoryEntity::class, FinancialRecordEntity::class], version = 1)
+@Database(entities = [FinancialCategoryEntity::class, FinancialRecordEntity::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
    abstract fun financialCategoryDao(): FinancialCategoryDao
    abstract fun financialRecordDao(): FinancialRecordDao

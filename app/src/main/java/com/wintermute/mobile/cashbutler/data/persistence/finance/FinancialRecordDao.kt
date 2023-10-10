@@ -16,7 +16,7 @@ interface FinancialRecordDao {
     /**
      * Persist new category.
      *
-     * @param category target category
+     * @param category target record
      */
     @Insert
     fun insert(category: FinancialRecordEntity): Long
@@ -24,23 +24,23 @@ interface FinancialRecordDao {
     /**
      * Selects financial category by id.
      *
-     * @param id of desired category
+     * @param id of desired record
      */
-    @Query("SELECT id, name, parent FROM FinancialCategories WHERE id = :id")
+    @Query("SELECT id, title, amount, category FROM FinancialRecords WHERE id = :id")
     fun getById(id: Long): FinancialRecordEntity
 
     /**
      * Selects financial category by id.
      *
-     * @param name of desired category
+     * @param title of desired record
      */
-    @Query("SELECT id, name, parent FROM FinancialCategories WHERE name = :name")
-    fun getByName(name: String)
+    @Query("SELECT id, title, amount, category FROM FinancialRecords WHERE title = :title")
+    fun getByName(title: String): FinancialRecordEntity
 
     /**
      * Updates a category.
      *
-     * @param category target category
+     * @param category target record
      */
     @Update
     fun update(category: FinancialRecordEntity)
@@ -49,7 +49,7 @@ interface FinancialRecordDao {
     /**
      * Removes a category.
      *
-     * @param category target category
+     * @param category target record
      */
     @Delete
     fun delete(category: FinancialRecordEntity)

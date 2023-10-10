@@ -36,7 +36,7 @@ interface FinancialCategoryDao {
      * @param name of desired category
      */
     @Query("SELECT id, name, parent FROM FinancialCategories WHERE name = :name")
-    fun getByName(name: String)
+    fun getByName(name: String): FinancialCategoryEntity
 
     /**
      * Updates a category.

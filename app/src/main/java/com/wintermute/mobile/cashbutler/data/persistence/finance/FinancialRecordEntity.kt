@@ -24,7 +24,7 @@ import androidx.room.PrimaryKey
         childColumns = ["category"],
         onDelete = ForeignKey.CASCADE
     )],
-    indices = [Index(value = ["title"], unique = true)]
+    indices = [Index(value = ["title"], unique = true), Index(value = ["category"], unique = false)]
 )
 data class FinancialRecordEntity(
     @PrimaryKey(autoGenerate = true)
@@ -34,7 +34,7 @@ data class FinancialRecordEntity(
     val title: String,
 
     @ColumnInfo
-    val amount: BigDecimal,
+    val amount: String,
 
     @ColumnInfo
     val category: Long = -1L
