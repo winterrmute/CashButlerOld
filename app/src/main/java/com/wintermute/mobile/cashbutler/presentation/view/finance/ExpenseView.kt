@@ -1,7 +1,7 @@
 package com.wintermute.mobile.cashbutler.presentation.view.finance
 
 import android.content.Context
-import android.util.Log
+import android.icu.math.BigDecimal
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,19 +15,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.wintermute.mobile.cashbutler.R
+import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
+import com.wintermute.mobile.cashbutler.presentation.intent.FinancialRecordIntent
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.HeaderTitle
-import com.wintermute.mobile.cashbutler.presentation.view.components.finance.ExpenseCategoryCard
-import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.FinancialDataViewModel
+import com.wintermute.mobile.cashbutler.presentation.view.components.finance.FinancialCategoryCard
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.ExpensesViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Composable
 fun ExpenseView(
-    vm: FinancialDataViewModel = hiltViewModel(),
+    vm: ExpensesViewModel = hiltViewModel(),
     @ApplicationContext context: Context = LocalContext.current.applicationContext
 ) {
-    val recordsState by vm.financialViewState.collectAsState()
-    val expenseRecords =
-        recordsState.financialRecords.filter { it.key != context.getString(R.string.budget_category) }
+    val recordsState by vm.state.collectAsState()
+    val expenseRecords = recordsState.financialRecords
 
     Column(
         modifier = Modifier
@@ -38,8 +39,17 @@ fun ExpenseView(
         HeaderTitle(value = context.getString(R.string.expenses_category))
 
         expenseRecords.forEach {
-            if (it.key != context.getString(R.string.budget_category)) {
-                ExpenseCategoryCard(title = it.key)
+            FinancialCategoryCard(category = it.key, items = it.value) { title, amount ->
+                vm.processIntent(
+                    FinancialRecordIntent.AddRecord(
+                        it.key,
+                        FinancialRecord(
+                            title = title,
+                            amount = BigDecimal(amount),
+                            category = it.key.id
+                        )
+                    )
+                )
             }
         }
     }

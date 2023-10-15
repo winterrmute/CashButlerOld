@@ -19,23 +19,24 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "FinancialRecords",
     foreignKeys = [ForeignKey(
-        entity = FinancialCategoryEntity::class,
-        parentColumns = ["id"],
+        entity = FinancialCategory::class,
+        parentColumns = ["financial_category_id"],
         childColumns = ["category"],
         onDelete = ForeignKey.CASCADE
     )],
-    indices = [Index(value = ["title"], unique = true), Index(value = ["category"], unique = false)]
+    indices = [Index(value = ["category"], unique = false)]
 )
-data class FinancialRecordEntity(
+data class FinancialRecord(
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "financial_record_id")
     val id: Long = 0L,
 
     @ColumnInfo
     val title: String,
 
     @ColumnInfo
-    val amount: String,
+    val amount: BigDecimal,
 
     @ColumnInfo
-    val category: Long = -1L
+    val category: Long
 )

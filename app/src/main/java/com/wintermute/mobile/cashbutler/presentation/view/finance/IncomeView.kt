@@ -1,6 +1,7 @@
 package com.wintermute.mobile.cashbutler.presentation.view.finance
 
 import android.content.Context
+import android.icu.math.BigDecimal
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,25 +18,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import arrow.core.getOrElse
 import com.wintermute.mobile.cashbutler.R
+import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialCategory
+import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
 import com.wintermute.mobile.cashbutler.presentation.intent.FinancialRecordIntent
 import com.wintermute.mobile.cashbutler.presentation.view.DialogWindow
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.CustomizableButton
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.HeaderTitle
-import com.wintermute.mobile.cashbutler.presentation.view.components.finance.ExpenseCategoryCard
-import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.FinancialDataViewModel
+import com.wintermute.mobile.cashbutler.presentation.view.components.finance.FinancialCategoryCard
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.BudgetViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Composable
 fun IncomeView(
-    vm: FinancialDataViewModel = hiltViewModel(),
+    vm: BudgetViewModel = hiltViewModel(),
     @ApplicationContext context: Context = LocalContext.current.applicationContext
 ) {
-    val category = "Budget"
+    val recordsState by vm.state.collectAsState()
+    val records = recordsState.financialRecords
+
     var recordsDialogVisible by remember { mutableStateOf(false) }
-    val recordsState by vm.financialViewState.collectAsState()
-    val records = recordsState.financialRecords[category]?.getOrElse { emptyList() }!!
 
     Column(
         modifier = Modifier
@@ -44,10 +46,19 @@ fun IncomeView(
             .padding(vertical = 5.dp, horizontal = 5.dp)
     ) {
         HeaderTitle(value = context.getString(R.string.budget_category))
-
-
-        records.forEach { el ->
-            ExpenseCategoryCard(title = el.title)
+        records.forEach {
+            FinancialCategoryCard(category = it.key, items = it.value) { title, amount ->
+                vm.processIntent(
+                    FinancialRecordIntent.AddRecord(
+                        it.key,
+                        FinancialRecord(
+                            title = title,
+                            amount = BigDecimal(amount),
+                            category = it.key.id
+                        )
+                    )
+                )
+            }
         }
 
         CustomizableButton(
@@ -58,23 +69,27 @@ fun IncomeView(
         }
 
         if (recordsDialogVisible) {
-            var selectedItems by remember { mutableStateOf(records.map { it.title }) }
+            var selectedItems by remember { mutableStateOf(records.map { it.key.name }) }
             DialogWindow(
                 content = {
-                    IncomeResourcesDialog(incomeResources = records, onItemSelected = {
+                    IncomeResourcesDialog(incomeResources = records.keys, onItemSelected = {
                         selectedItems = it
                     })
                 },
                 onConfirm = {
                     selectedItems.forEach {
-                        if (records.none { r -> r.title == it }) {
-                            vm.processIntent(FinancialRecordIntent.AddRecord(category, it, "0.0"))
+                        if (records.none { r -> r.key.name == it }) {
+                            vm.processIntent(
+                                FinancialRecordIntent.AddFinanceCategory(
+                                    FinancialCategory(name = it, parent = 1L)
+                                )
+                            )
                         }
                     }
 
                     records.forEach {
-                        if (!selectedItems.contains(it.title)) {
-                            vm.processIntent(FinancialRecordIntent.RemoveRecord(category, it.title))
+                        if (!selectedItems.contains(it.key.name)) {
+                            vm.processIntent(FinancialRecordIntent.RemoveCategory(it.key))
                         }
                     }
                     recordsDialogVisible = false
@@ -86,3 +101,4 @@ fun IncomeView(
         }
     }
 }
+

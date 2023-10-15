@@ -12,16 +12,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.wintermute.mobile.cashbutler.R
-import com.wintermute.mobile.cashbutler.presentation.intent.FinancialRecordIntent
-import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.FinancialDataViewModel
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.CustomizableButton
 
+/**
+ * Editable record panel for adding new records to financial categories.
+ *
+ * @param onConfirm action which should be done on hit on confirm button
+ */
 @Composable
 fun EditableFinanceRecordPanel(
-    vm: FinancialDataViewModel = hiltViewModel(),
-    category: String
+    onConfirm: (title: String, amount: String) -> Unit,
 ) {
     var addingFinancialRecord by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -41,16 +42,12 @@ fun EditableFinanceRecordPanel(
         }
         Row {
             val value =
-                if (addingFinancialRecord) context.getString(R.string.button_save) else context.getString(R.string.button_add)
+                if (addingFinancialRecord) context.getString(R.string.button_save) else context.getString(
+                    R.string.button_add
+                )
             CustomizableButton(value = value, buttonColor = Color(123, 175, 228)) {
                 if (addingFinancialRecord) {
-                    vm.processIntent(
-                        FinancialRecordIntent.AddRecord(
-                            category,
-                            title,
-                            amount
-                        )
-                    )
+                    onConfirm(title, amount)
                 }
 
                 addingFinancialRecord = !addingFinancialRecord

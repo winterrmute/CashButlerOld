@@ -13,7 +13,6 @@ import androidx.navigation.compose.rememberNavController
 import com.wintermute.mobile.cashbutler.presentation.view.ScreenViews
 import com.wintermute.mobile.cashbutler.presentation.view.finance.ExpenseView
 import com.wintermute.mobile.cashbutler.presentation.view.finance.FinancialProfileWizardView
-import com.wintermute.mobile.cashbutler.presentation.view.finance.IncomeView
 import com.wintermute.mobile.cashbutler.ui.theme.CashButlerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,7 +33,6 @@ class MainActivity : ComponentActivity() {
                         startDestination = ScreenViews.BUDGET.viewName,
                     ) {
                         composable(ScreenViews.BUDGET.viewName) {
-//                            IncomeView(navHostController = navHostController)
                             FinancialProfileWizardView(navHostController = navHostController)
                         }
                         composable(ScreenViews.EXPENSES.viewName) {

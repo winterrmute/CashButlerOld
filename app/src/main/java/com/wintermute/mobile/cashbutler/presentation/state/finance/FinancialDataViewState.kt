@@ -1,7 +1,7 @@
 package com.wintermute.mobile.cashbutler.presentation.state.finance
 
-import arrow.core.Option
-import com.wintermute.mobile.cashbutler.domain.finance.FinancialRecord
+import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialCategory
+import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
 
 /**
  * Represents the hold state of financial records.
@@ -9,5 +9,5 @@ import com.wintermute.mobile.cashbutler.domain.finance.FinancialRecord
  * @author k.kosinski
  */
 data class FinancialDataViewState(
-    val financialRecords: Map<String, Option<List<FinancialRecord>>>
+    val financialRecords: Map<FinancialCategory, List<FinancialRecord>>,
 )

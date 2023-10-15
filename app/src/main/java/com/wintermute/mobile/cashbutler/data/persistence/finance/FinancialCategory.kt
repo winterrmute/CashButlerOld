@@ -18,13 +18,14 @@ import androidx.room.PrimaryKey
     tableName = "FinancialCategories",
     indices = [Index(value = ["name"], unique = true)]
 )
-data class FinancialCategoryEntity(
+data class FinancialCategory(
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "financial_category_id")
     val id: Long = 0L,
 
     @ColumnInfo
     val name: String,
 
     @ColumnInfo
-    val parent: Long = -1L
+    val parent: Long
 )
