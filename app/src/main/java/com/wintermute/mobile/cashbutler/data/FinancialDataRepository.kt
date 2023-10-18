@@ -38,6 +38,10 @@ class FinancialDataRepository @Inject constructor(
         categoryDao.delete(category)
     }
 
+    fun removeRecord(record: FinancialRecord) {
+        return recordDao.delete(record);
+    }
+
     fun getExpenseCategory(): FinancialCategory {
         return categoryDao.getByName(FinancialCategories.EXPENSES.displayName)
     }

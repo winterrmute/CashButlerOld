@@ -1,6 +1,5 @@
-package com.wintermute.mobile.cashbutler.presentation.view.finance
+package com.wintermute.mobile.cashbutler.presentation.view.finance.wizard
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.wintermute.mobile.cashbutler.presentation.view.ScreenViewNames
 
 @Composable
 fun FinancialProfileWizardView(
@@ -47,6 +47,9 @@ fun FinancialProfileWizardView(
             when (currentPage) {
                 0 -> IncomeView()
                 1 -> ExpenseView()
+                2 -> FinancialGoalsView {
+                    navHostController.navigate(ScreenViewNames.DASHBOARD.name)
+                }
             }
         }
 
@@ -59,14 +62,12 @@ fun FinancialProfileWizardView(
             onBack = {
                 if (currentPage > 0) {
                     currentPage--
-                    Log.d("FINDME", "BACK: $currentPage")
                 }
             },
             onForward = {
 
                 if (currentPage < wizardSteps - 1) {
                     currentPage++
-                    Log.d("FINDME", "FORWARD: $currentPage")
                 }
             })
     }

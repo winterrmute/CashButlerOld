@@ -5,6 +5,9 @@ import android.content.Context
 import androidx.room.Room
 import com.wintermute.mobile.cashbutler.data.FinancialDataRepository
 import com.wintermute.mobile.cashbutler.data.persistence.AppDatabase
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.BudgetViewModel
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.ExpensesViewModel
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.FinancialViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,6 +34,16 @@ class AppModule {
         "CashButler"
     ).createFromAsset("sqlite.db")
         .build()
+
+    @Provides
+    fun provideBudgetViewModel(db: AppDatabase): BudgetViewModel {
+        return BudgetViewModel(provideFinancialDataRepository(db))
+    }
+
+    @Provides
+    fun provideExpenseViewModel(db: AppDatabase): ExpensesViewModel {
+        return ExpensesViewModel(provideFinancialDataRepository(db))
+    }
 
     @Provides
     fun provideFinancialCategoryDao(db: AppDatabase) = db.financialCategoryDao()

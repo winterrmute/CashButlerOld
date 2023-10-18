@@ -1,17 +1,15 @@
 package com.wintermute.mobile.cashbutler.presentation.viewmodel.finance
 
+import android.icu.math.BigDecimal
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import arrow.core.Option
-import arrow.core.toOption
 import com.wintermute.mobile.cashbutler.data.FinancialDataRepository
-import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialCategory
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
 import com.wintermute.mobile.cashbutler.domain.finance.FinancialCategories
 import com.wintermute.mobile.cashbutler.presentation.intent.FinancialRecordIntent
-import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDataViewState
+import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDataState
+import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDataState.Initialized
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -26,13 +24,34 @@ abstract class FinancialViewModel(
     private val category: FinancialCategories
 ) : ViewModel(), BaseFinancialViewModel {
 
-    private val _state = MutableStateFlow(FinancialDataViewState(emptyMap()))
-    val state: StateFlow<FinancialDataViewState> = _state
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            retrieveData(repository.getFinancialData(category))
+    private val _state =
+        MutableStateFlow<FinancialDataState>(FinancialDataState.Uninitialized).apply {
+            retrieveData()
         }
+    val state: StateFlow<FinancialDataState> = _state
+
+    override fun retrieveData() {
+        //TODO: handle errors
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getFinancialData(category).collect { records ->
+                val preparedRecords = records.mapValues { (_, records) -> records }
+                val balance = calculateBalance(preparedRecords.values.flatten())
+                _state.value =
+                    Initialized(
+                        financialRecords = records.mapValues { (_, records) -> records },
+                        balance = balance
+                    )
+            }
+        }
+
+    }
+
+    private fun calculateBalance(records: List<FinancialRecord>): BigDecimal {
+        var result = BigDecimal.ZERO
+        records.forEach {
+            result = result.add(it.amount)
+        }
+        return result
     }
 
 
@@ -56,18 +75,6 @@ abstract class FinancialViewModel(
         }
     }
 
-    override fun retrieveData(
-        recordsFlow: Flow<Map<FinancialCategory, List<FinancialRecord>>>,
-    ) {
-        //TODO: handle errors
-        viewModelScope.launch(Dispatchers.IO) {
-            recordsFlow.collect { records ->
-                _state.value =
-                    FinancialDataViewState(financialRecords = records.mapValues { (_, records) -> records })
-            }
-        }
-    }
-
     override fun addCategory(intent: FinancialRecordIntent.AddFinanceCategory) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.storeCategory(category = intent.category)
@@ -76,7 +83,7 @@ abstract class FinancialViewModel(
 
 
     override fun removeCategory(intent: FinancialRecordIntent.RemoveCategory) {
-        repository.removeCategory(intent.category)
+        viewModelScope.launch(Dispatchers.IO) { repository.removeCategory(intent.category) }
     }
 
     override fun addRecord(intent: FinancialRecordIntent.AddRecord) {
@@ -93,21 +100,15 @@ abstract class FinancialViewModel(
     }
 
     override fun removeRecord(intent: FinancialRecordIntent.RemoveRecord) {
-        val categoryOption: Option<FinancialCategory> =
-            _state.value.financialRecords.keys.find { it.id == intent.record.id }
-                .toOption()
-
-        categoryOption.fold(
-            { _state.value.financialRecords },
-            { category ->
-                _state.value.financialRecords.mapValues { (key, records) ->
-                    if (key == category) {
-                        records.filter { it.id != intent.record.id }
-                    } else {
-                        records
-                    }
-                }
+        when (_state.value) {
+            is Initialized -> {
+                repository.removeRecord(intent.record)
+                TODO("Handle error")
             }
-        )
+
+            else -> {
+                TODO("Handle uninitialized state or error")
+            }
+        }
     }
 }

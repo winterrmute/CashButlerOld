@@ -10,6 +10,7 @@ fun IncomeResourcesDialog(
     incomeResources: Set<FinancialCategory>,
     onItemSelected: (List<String>) -> Unit
 ) {
+    //TODO: move to database
     val items = listOf(
         "Income",
         "Investments",

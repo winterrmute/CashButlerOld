@@ -1,4 +1,4 @@
-package com.wintermute.mobile.cashbutler.presentation.view.finance
+package com.wintermute.mobile.cashbutler.presentation.view.finance.wizard
 
 import android.content.Context
 import android.icu.math.BigDecimal
@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.wintermute.mobile.cashbutler.R
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
 import com.wintermute.mobile.cashbutler.presentation.intent.FinancialRecordIntent
+import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDataState
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.HeaderTitle
 import com.wintermute.mobile.cashbutler.presentation.view.components.finance.FinancialCategoryCard
 import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.ExpensesViewModel
@@ -28,7 +29,6 @@ fun ExpenseView(
     @ApplicationContext context: Context = LocalContext.current.applicationContext
 ) {
     val recordsState by vm.state.collectAsState()
-    val expenseRecords = recordsState.financialRecords
 
     Column(
         modifier = Modifier
@@ -38,19 +38,25 @@ fun ExpenseView(
     ) {
         HeaderTitle(value = context.getString(R.string.expenses_category))
 
-        expenseRecords.forEach {
-            FinancialCategoryCard(category = it.key, items = it.value) { title, amount ->
-                vm.processIntent(
-                    FinancialRecordIntent.AddRecord(
-                        it.key,
-                        FinancialRecord(
-                            title = title,
-                            amount = BigDecimal(amount),
-                            category = it.key.id
+        when (val state = recordsState) {
+            is FinancialDataState.Initialized -> {
+                state.financialRecords.forEach {
+                    FinancialCategoryCard(category = it.key, items = it.value) { title, amount ->
+                        vm.processIntent(
+                            FinancialRecordIntent.AddRecord(
+                                it.key,
+                                FinancialRecord(
+                                    title = title,
+                                    amount = BigDecimal(amount),
+                                    category = it.key.id
+                                )
+                            )
                         )
-                    )
-                )
+                    }
+                }
             }
+
+            else -> {}
         }
     }
 }

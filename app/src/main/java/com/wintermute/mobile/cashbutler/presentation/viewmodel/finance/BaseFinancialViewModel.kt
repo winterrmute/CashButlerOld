@@ -11,9 +11,7 @@ import kotlinx.coroutines.flow.Flow
  * @author k.kosinski
  */
 interface BaseFinancialViewModel {
-    fun retrieveData(
-        recordsFlow: Flow<Map<FinancialCategory, List<FinancialRecord>>>,
-    )
+    fun retrieveData()
 
     fun processIntent(intent: FinancialRecordIntent)
 

@@ -61,5 +61,5 @@ interface FinancialRecordDao {
      * @param category target record
      */
     @Delete
-    suspend fun delete(category: FinancialRecord)
+    fun delete(category: FinancialRecord)
 }
