@@ -51,14 +51,14 @@ fun IncomeView(
         when (val state = recordsState) {
             is FinancialDataState.Initialized -> {
                 state.financialRecords.forEach {
-                    FinancialCategoryCard(category = it.key, items = it.value) { title, amount ->
+                    FinancialCategoryCard(category = it.category, items = it.records) { title, amount ->
                         vm.processIntent(
                             FinancialRecordIntent.AddRecord(
-                                it.key,
+                                it.category,
                                 FinancialRecord(
                                     title = title,
                                     amount = BigDecimal(amount),
-                                    category = it.key.id
+                                    category = it.category.id
                                 )
                             )
                         )
@@ -73,16 +73,16 @@ fun IncomeView(
                 }
 
                 if (recordsDialogVisible) {
-                    var selectedItems by remember { mutableStateOf(state.financialRecords.map { it.key.name }) }
+                    var selectedItems by remember { mutableStateOf(state.financialRecords.map { it.category.name }) }
                     DialogWindow(
                         content = {
-                            IncomeResourcesDialog(incomeResources = state.financialRecords.keys, onItemSelected = {
+                            IncomeResourcesDialog(incomeResources = state.financialRecords, onItemSelected = {
                                 selectedItems = it
                             })
                         },
                         onConfirm = {
                             selectedItems.forEach {
-                                if (state.financialRecords.none { r -> r.key.name == it }) {
+                                if (state.financialRecords.none { r -> r.category.name == it }) {
                                     vm.processIntent(
                                         FinancialRecordIntent.AddFinanceCategory(
                                             FinancialCategory(name = it, parent = 1L)
@@ -92,8 +92,8 @@ fun IncomeView(
                             }
 
                             state.financialRecords.forEach {
-                                if (!selectedItems.contains(it.key.name)) {
-                                    vm.processIntent(FinancialRecordIntent.RemoveCategory(it.key))
+                                if (!selectedItems.contains(it.category.name)) {
+                                    vm.processIntent(FinancialRecordIntent.RemoveCategory(it.category))
                                 }
                             }
                             recordsDialogVisible = false
@@ -105,7 +105,8 @@ fun IncomeView(
                 }
             }
 
-            else -> {}
+            is FinancialDataState.Error -> {}
+            FinancialDataState.Uninitialized -> {}
         }
     }
 }

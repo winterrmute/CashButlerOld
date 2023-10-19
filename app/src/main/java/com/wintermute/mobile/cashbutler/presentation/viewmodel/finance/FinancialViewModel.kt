@@ -34,15 +34,18 @@ abstract class FinancialViewModel(
         //TODO: handle errors
         viewModelScope.launch(Dispatchers.IO) {
             repository.getFinancialData(category).collect { records ->
-                val preparedRecords = records.mapValues { (_, records) -> records }
-                    .map { (key, value) ->
-                        key.copy(balance = calculateBalance(value)) to value
-                    }.toMap()
-                val balance = calculateBalance(preparedRecords.values.flatten())
+                var balance = BigDecimal.ZERO
+                val processedRecords = records.map {
+                    val currentBalance = calculateBalance(it.records)
+                    balance = balance.add(currentBalance)
+                    it.copy(
+                        category = it.category.copy(balance = currentBalance),
+                        records = it.records
+                    )
+                }
                 _state.value =
                     Initialized(
-                        financialRecords = preparedRecords,
-//                        records.mapValues { (_, records) -> records },
+                        financialRecords = processedRecords,
                         balance = balance
                     )
             }

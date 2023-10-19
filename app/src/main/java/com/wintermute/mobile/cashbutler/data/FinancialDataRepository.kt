@@ -1,12 +1,12 @@
 package com.wintermute.mobile.cashbutler.data
 
+import com.wintermute.mobile.cashbutler.data.persistence.finance.CategoryWithRecords
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialCategory
 import com.wintermute.mobile.cashbutler.data.persistence.finance.dao.FinancialCategoryDao
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
 import com.wintermute.mobile.cashbutler.data.persistence.finance.dao.FinancialRecordDao
 import com.wintermute.mobile.cashbutler.domain.finance.FinancialCategories
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class FinancialDataRepository @Inject constructor(
@@ -14,12 +14,8 @@ class FinancialDataRepository @Inject constructor(
     private val recordDao: FinancialRecordDao
 ) {
 
-    fun getFinancialData(category: FinancialCategories): Flow<Map<FinancialCategory, List<FinancialRecord>>> {
-        return categoryDao.getCategoriesWithItems(category.displayName).map {
-            it.associate { categoryWithRecords ->
-                categoryWithRecords.category to categoryWithRecords.records
-            }
-        }
+    fun getFinancialData(category: FinancialCategories): Flow<List<CategoryWithRecords>> {
+        return categoryDao.getCategoriesWithItems(category.displayName)
     }
 
     fun storeCategory(category: FinancialCategory): Long {
@@ -39,7 +35,7 @@ class FinancialDataRepository @Inject constructor(
     }
 
     fun removeRecord(record: FinancialRecord) {
-        return recordDao.delete(record);
+        return recordDao.delete(record)
     }
 
     fun getExpenseCategory(): FinancialCategory {

@@ -41,14 +41,14 @@ fun ExpenseView(
         when (val state = recordsState) {
             is FinancialDataState.Initialized -> {
                 state.financialRecords.forEach {
-                    FinancialCategoryCard(category = it.key, items = it.value) { title, amount ->
+                    FinancialCategoryCard(category = it.category, items = it.records) { title, amount ->
                         vm.processIntent(
                             FinancialRecordIntent.AddRecord(
-                                it.key,
+                                it.category,
                                 FinancialRecord(
                                     title = title,
                                     amount = BigDecimal(amount),
-                                    category = it.key.id
+                                    category = it.category.id
                                 )
                             )
                         )
@@ -56,7 +56,8 @@ fun ExpenseView(
                 }
             }
 
-            else -> {}
+            is FinancialDataState.Error -> {}
+            FinancialDataState.Uninitialized -> {}
         }
     }
 }

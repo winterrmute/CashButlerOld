@@ -2,7 +2,7 @@ package com.wintermute.mobile.cashbutler.presentation.viewmodel.finance
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialCategory
+import com.wintermute.mobile.cashbutler.data.persistence.finance.CategoryWithRecords
 import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDashboardState
 import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDataState
 import com.wintermute.mobile.cashbutler.presentation.view.components.reporting.DonutChartData
@@ -20,7 +20,6 @@ class FinancialDashboardViewModel @Inject constructor(
     private val budgetViewModel: BudgetViewModel,
     private val expensesViewModel: ExpensesViewModel
 ) : ViewModel() {
-
     private val _state =
         MutableStateFlow<FinancialDashboardState>(FinancialDashboardState.Uninitialized).apply {
             handleInitializedState()
@@ -44,8 +43,8 @@ class FinancialDashboardViewModel @Inject constructor(
         val expensesState = expensesViewModel.state.value
 
         if (budgetState is FinancialDataState.Initialized && expensesState is FinancialDataState.Initialized) {
-            val budgetChartData = prepareChartData(budgetState.financialRecords.keys)
-            val expensesChartData = prepareChartData(expensesState.financialRecords.keys)
+            val budgetChartData = prepareChartData(budgetState.financialRecords)
+            val expensesChartData = prepareChartData(expensesState.financialRecords)
             _state.value = FinancialDashboardState.Initialized(
                 budget = budgetState.balance,
                 expenses = expensesState.balance,
@@ -59,9 +58,9 @@ class FinancialDashboardViewModel @Inject constructor(
         }
     }
 
-    private fun prepareChartData(data:Set<FinancialCategory>): List<DonutChartData>{
+    private fun prepareChartData(data: List<CategoryWithRecords>): List<DonutChartData>{
         return data.mapIndexed { index, item ->
-            DonutChartData(item.balance.toFloat(), color = ChartColors.getByIndex(index), title = item.name)
-        }.toList()
+            DonutChartData(item.category.balance.toFloat(), color = ChartColors.getByIndex(index), title = item.category.name)
+        }
     }
 }
