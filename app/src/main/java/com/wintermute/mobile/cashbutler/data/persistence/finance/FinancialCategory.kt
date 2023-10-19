@@ -1,7 +1,9 @@
 package com.wintermute.mobile.cashbutler.data.persistence.finance
 
+import android.icu.math.BigDecimal
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
@@ -27,5 +29,10 @@ data class FinancialCategory(
     val name: String,
 
     @ColumnInfo
-    val parent: Long
-)
+    val parent: Long,
+
+    @Ignore
+    var balance: BigDecimal = BigDecimal.ZERO
+) {
+    constructor(id: Long = 0L, name: String, parent: Long): this(id, name, parent, BigDecimal.ZERO)
+}

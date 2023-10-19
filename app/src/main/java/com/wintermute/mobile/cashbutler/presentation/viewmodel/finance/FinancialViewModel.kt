@@ -35,10 +35,14 @@ abstract class FinancialViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             repository.getFinancialData(category).collect { records ->
                 val preparedRecords = records.mapValues { (_, records) -> records }
+                    .map { (key, value) ->
+                        key.copy(balance = calculateBalance(value)) to value
+                    }.toMap()
                 val balance = calculateBalance(preparedRecords.values.flatten())
                 _state.value =
                     Initialized(
-                        financialRecords = records.mapValues { (_, records) -> records },
+                        financialRecords = preparedRecords,
+//                        records.mapValues { (_, records) -> records },
                         balance = balance
                     )
             }
