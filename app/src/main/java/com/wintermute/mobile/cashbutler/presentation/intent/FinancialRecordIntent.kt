@@ -15,16 +15,28 @@ sealed class FinancialRecordIntent {
      *
      * @param category financial category
      */
-    data class AddFinanceCategory(val category: FinancialCategory): FinancialRecordIntent()
+    data class AddFinanceCategory(val category: FinancialCategory) : FinancialRecordIntent()
+
+    /**
+     * Intent removing a financial category
+     *
+     * @param category target to remove
+     */
+    class RemoveCategory(val category: FinancialCategory) : FinancialRecordIntent()
 
     /**
      * Intent creating new financial record inside category
      *
-     * @param category enclosing the financial record
      * @param record target to persist
      */
-    data class AddRecord(val category: FinancialCategory, val record: FinancialRecord) :
-        FinancialRecordIntent()
+    data class AddRecord(val record: FinancialRecord) : FinancialRecordIntent()
+
+    /**
+     * Intent updating existing financial record
+     *
+     * @param record target to persist
+     */
+    data class UpdateRecord(val record: FinancialRecord) : FinancialRecordIntent()
 
     /**
      * Intent removing a financial record
@@ -32,11 +44,4 @@ sealed class FinancialRecordIntent {
      * @param record target record to remove
      */
     class RemoveRecord(val record: FinancialRecord) : FinancialRecordIntent()
-
-    /**
-     * Intent removing a financial category
-     *
-     * @param category target to remove
-     */
-    class RemoveCategory(val category: FinancialCategory): FinancialRecordIntent()
 }

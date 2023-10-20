@@ -68,6 +68,10 @@ abstract class FinancialViewModel(
                 addRecord(intent)
             }
 
+            is FinancialRecordIntent.UpdateRecord -> {
+                updateRecord(intent)
+            }
+
             is FinancialRecordIntent.RemoveRecord -> {
                 removeRecord(intent)
             }
@@ -79,6 +83,7 @@ abstract class FinancialViewModel(
             is FinancialRecordIntent.RemoveCategory -> {
                 removeCategory(intent)
             }
+
         }
     }
 
@@ -97,7 +102,7 @@ abstract class FinancialViewModel(
         var newRecord = FinancialRecord(
             title = intent.record.title,
             amount = intent.record.amount,
-            category = intent.category.id
+            category = intent.record.category
         )
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -106,16 +111,13 @@ abstract class FinancialViewModel(
         }
     }
 
-    override fun removeRecord(intent: FinancialRecordIntent.RemoveRecord) {
-        when (_state.value) {
-            is Initialized -> {
-                repository.removeRecord(intent.record)
-                TODO("Handle error")
-            }
-
-            else -> {
-                TODO("Handle uninitialized state or error")
-            }
+    override fun updateRecord(intent: FinancialRecordIntent.UpdateRecord) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateRecord(record = intent.record)
         }
+    }
+
+    override fun removeRecord(intent: FinancialRecordIntent.RemoveRecord) {
+        viewModelScope.launch(Dispatchers.IO) { repository.removeRecord(intent.record) }
     }
 }

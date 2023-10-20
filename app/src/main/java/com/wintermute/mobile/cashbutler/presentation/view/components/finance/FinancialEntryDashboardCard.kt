@@ -8,10 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,11 +18,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun FinancialCategoryCard(
+fun FinancialEntryDashboardCard(
     title: String,
     balance: String,
     onClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    color: Color = Color.Black
 ) {
     Box(
         modifier = Modifier
@@ -45,30 +41,23 @@ fun FinancialCategoryCard(
                         Text(
                             text = title,
                             style = androidx.compose.ui.text.TextStyle(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = color
                             ),
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         Text(
                             text = balance,
                             style = androidx.compose.ui.text.TextStyle(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Normal
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = color
                             )
                         )
                     }
                 }
-                Box(modifier = Modifier.weight(0.1f)) {
-                    IconButton(onClick = { onDeleteClick() }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete"
-                        )
-                    }
-                }
             }
-
         }
     }
 }

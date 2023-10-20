@@ -2,8 +2,6 @@ package com.wintermute.mobile.cashbutler.presentation.view.finance
 
 import android.icu.math.BigDecimal
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,9 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDashboardState
-import com.wintermute.mobile.cashbutler.presentation.view.components.core.CustomizableLabelCard
+import com.wintermute.mobile.cashbutler.presentation.view.components.finance.FinancialEntryDashboardCard
 import com.wintermute.mobile.cashbutler.presentation.view.components.reporting.DonutChart
 import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.FinancialDashboardViewModel
+import com.wintermute.mobile.cashbutler.ui.theme.appGreen
 
 @Composable
 fun FinancialDashboard(
@@ -41,7 +40,7 @@ fun FinancialDashboard(
                     .padding(vertical = 5.dp, horizontal = 5.dp)
 
             ) {
-                var actualChartData by remember { mutableStateOf(dataState.budgetData) }
+                val actualChartData by remember { mutableStateOf(dataState.budgetData) }
                 DonutChart(Modifier.padding(15.dp), data = actualChartData)
                 { selected ->
                     AnimatedContent(targetState = selected, label = "") {
@@ -57,21 +56,29 @@ fun FinancialDashboard(
                         }
                     }
                 }
-                CustomizableLabelCard(
-                    label = "BUDGET: ${dataState.budget}",
-                    modifier = Modifier.background(color = Color.Green)
-                        .clickable { actualChartData = dataState.budgetData}
+
+                FinancialEntryDashboardCard(
+                    title = "BUDGET:",
+                    balance = "${dataState.budget}",
+                    onClick = { /*TODO*/ }
                 )
-                CustomizableLabelCard(
-                    label = "EXPENSES: ${dataState.expenses}",
-                    modifier = Modifier.background(color = Color.Gray)
-                        .clickable { actualChartData = dataState.expensesData}
+
+                FinancialEntryDashboardCard(
+                    title = "EXPENSES:",
+                    balance = "${dataState.expenses}",
+                    onClick = { /*TODO*/ })
+
+                FinancialEntryDashboardCard(
+                    title = "BALANCE:",
+                    balance = "${dataState.balance}",
+                    onClick = { /*TODO*/ },
+                    color = if (dataState.balance < BigDecimal.ZERO) {
+                        Color.Red
+                    } else {
+                        appGreen
+                    }
                 )
-                CustomizableLabelCard(
-                    label = "BALANCE: ${dataState.balance}",
-                    modifier = Modifier.background(color = if (dataState.balance > BigDecimal.ZERO) Color.Green else Color.Red)
-                        .clickable { actualChartData = dataState.balanceData}
-                )
+
             }
         }
 

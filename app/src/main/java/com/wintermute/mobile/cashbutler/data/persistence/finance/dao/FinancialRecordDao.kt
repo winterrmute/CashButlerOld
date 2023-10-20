@@ -52,7 +52,7 @@ interface FinancialRecordDao {
      * @param category target record
      */
     @Update
-    suspend fun update(category: FinancialRecord)
+    fun update(category: FinancialRecord): Int
 
 
     /**

@@ -2,11 +2,12 @@ package com.wintermute.mobile.cashbutler.data
 
 import com.wintermute.mobile.cashbutler.data.persistence.finance.CategoryWithRecords
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialCategory
-import com.wintermute.mobile.cashbutler.data.persistence.finance.dao.FinancialCategoryDao
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
+import com.wintermute.mobile.cashbutler.data.persistence.finance.dao.FinancialCategoryDao
 import com.wintermute.mobile.cashbutler.data.persistence.finance.dao.FinancialRecordDao
 import com.wintermute.mobile.cashbutler.domain.finance.FinancialCategories
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class FinancialDataRepository @Inject constructor(
@@ -14,8 +15,8 @@ class FinancialDataRepository @Inject constructor(
     private val recordDao: FinancialRecordDao
 ) {
 
-    fun getFinancialData(category: FinancialCategories): Flow<List<CategoryWithRecords>> {
-        return categoryDao.getCategoriesWithItems(category.displayName)
+    fun getFinancialData(category: FinancialCategories): Flow<Set<CategoryWithRecords>> {
+        return categoryDao.getCategoriesWithItems(category.displayName).map { it.toSet() }
     }
 
     fun storeCategory(category: FinancialCategory): Long {
@@ -26,11 +27,15 @@ class FinancialDataRepository @Inject constructor(
         return recordDao.insert(record)
     }
 
+    fun updateRecord(record: FinancialRecord) {
+        recordDao.update(record)
+    }
+
     fun getBudgetCategory(): FinancialCategory {
         return categoryDao.getByName(FinancialCategories.BUDGET.displayName)
     }
 
-    fun removeCategory(category: FinancialCategory){
+    fun removeCategory(category: FinancialCategory) {
         categoryDao.delete(category)
     }
 

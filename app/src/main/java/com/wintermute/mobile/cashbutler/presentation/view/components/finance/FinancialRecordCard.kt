@@ -1,5 +1,6 @@
 package com.wintermute.mobile.cashbutler.presentation.view.components.finance
 
+import android.icu.math.BigDecimal
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,10 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun FinancialCategoryCard(
+fun FinancialRecordCard(
     title: String,
-    balance: String,
-    onClick: () -> Unit,
+    amount: BigDecimal,
+    onClick: () -> Unit = {},
     onDeleteClick: () -> Unit
 ) {
     Box(
@@ -45,20 +46,21 @@ fun FinancialCategoryCard(
                         Text(
                             text = title,
                             style = androidx.compose.ui.text.TextStyle(
-                                fontSize = 20.sp,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             ),
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         Text(
-                            text = balance,
+                            text = amount.toString(),
                             style = androidx.compose.ui.text.TextStyle(
-                                fontSize = 14.sp,
+                                fontSize = 24.sp,
                                 fontWeight = FontWeight.Normal
                             )
                         )
                     }
                 }
+
                 Box(modifier = Modifier.weight(0.1f)) {
                     IconButton(onClick = { onDeleteClick() }) {
                         Icon(
@@ -68,7 +70,6 @@ fun FinancialCategoryCard(
                     }
                 }
             }
-
         }
     }
 }
