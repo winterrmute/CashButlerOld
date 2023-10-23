@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,7 +15,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.sp
 
 /**
  * Represents an input field with a label.
@@ -28,9 +31,15 @@ fun LabeledInputField(
     modifier: Modifier = Modifier,
     label: String,
     value: String = "",
-    onValueChange: (String) -> Unit = {}
+    onValueChange: (String) -> Unit = {},
+    errorMessage: String
 ) {
     var text by remember { mutableStateOf(TextFieldValue(value)) }
+    var color by remember { mutableStateOf(Color.Black) }
+
+    if (errorMessage.isNotBlank()) {
+        color = Color.Red
+    }
 
     Column(
         modifier = Modifier
@@ -47,7 +56,18 @@ fun LabeledInputField(
                     onValueChange(it.text)
                 },
                 label = { Text(label) },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    unfocusedBorderColor = color
+                )
             )
         }
+        Text(
+            text = errorMessage,
+            style = androidx.compose.ui.text.TextStyle(
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.Red
+            )
+        )
     }
 }
