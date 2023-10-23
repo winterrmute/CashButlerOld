@@ -32,8 +32,9 @@ import com.wintermute.mobile.cashbutler.presentation.view.ScreenViewNames
 @Composable
 fun FinancialProfileWizardView(
     navHostController: NavHostController,
+    page: Int
 ) {
-    var currentPage by rememberSaveable { mutableIntStateOf(0) }
+    var currentPage by rememberSaveable { mutableIntStateOf(page) }
     val wizardSteps = 3
 
     Column(
@@ -45,9 +46,9 @@ fun FinancialProfileWizardView(
                 .fillMaxSize()
         ) {
             when (currentPage) {
-                0 -> IncomeView()
-                1 -> ExpenseView()
-                2 -> FinancialGoalsView {
+                WizardSteps.BUDGET.ordinal -> IncomeView()
+                WizardSteps.EXPENSES.ordinal -> ExpenseView()
+                WizardSteps.FINANCIAL_GOALS.ordinal -> FinancialGoalsView {
                     navHostController.navigate(ScreenViewNames.DASHBOARD.name)
                 }
             }
@@ -70,14 +71,16 @@ fun FinancialProfileWizardView(
                     currentPage++
                 }
             })
-    }
 
-    BackHandler {
-        if (currentPage > 0) {
-            currentPage--
+        BackHandler {
+            println()
+            if (currentPage > 0) {
+                currentPage--
+            } else {
+                navHostController.popBackStack()
+            }
         }
     }
-
 }
 
 @Composable

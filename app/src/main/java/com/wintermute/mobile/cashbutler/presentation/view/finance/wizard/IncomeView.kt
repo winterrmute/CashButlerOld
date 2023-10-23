@@ -1,6 +1,7 @@
 package com.wintermute.mobile.cashbutler.presentation.view.finance.wizard
 
 import android.content.Context
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import arrow.core.const
 import com.wintermute.mobile.cashbutler.R
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialCategory
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
@@ -77,7 +79,7 @@ fun IncomeView(
                         onAdd = {
                             vm.processIntent(FinancialRecordIntent.AddRecord(record = it))
                         },
-                        onUpdate = { 
+                        onUpdate = {
                             vm.processIntent(FinancialRecordIntent.UpdateRecord(record = it))
                         },
                         onDelete = {
@@ -122,12 +124,6 @@ fun IncomeView(
                             recordsDialogVisible = false
                         }
                     )
-                }
-
-                BackHandler {
-                    if (categoryDetailViewVisible) {
-                        categoryDetailViewVisible = false
-                    }
                 }
             }
 

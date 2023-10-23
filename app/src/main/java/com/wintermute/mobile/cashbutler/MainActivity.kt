@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.wintermute.mobile.cashbutler.presentation.view.ScreenViewNames
 import com.wintermute.mobile.cashbutler.presentation.view.finance.FinancialDashboard
 import com.wintermute.mobile.cashbutler.presentation.view.finance.wizard.FinancialProfileWizardView
@@ -30,13 +32,19 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(
                         navController = navHostController,
-                        startDestination = ScreenViewNames.WIZARD.name,
+                        startDestination = ScreenViewNames.DASHBOARD.name,
                     ) {
-                        composable(ScreenViewNames.WIZARD.name) {
-                            FinancialProfileWizardView(navHostController = navHostController)
+                        composable(
+                            route = "${ScreenViewNames.WIZARD.name}/{page}",
+                            arguments = listOf(navArgument("page") {type = NavType.IntType})
+                        ) {
+                            val desiredPage = it.arguments?.getInt("page") ?: 0
+                            FinancialProfileWizardView(
+                                navHostController = navHostController,
+                                page = desiredPage)
                         }
                         composable(ScreenViewNames.DASHBOARD.name) {
-                            FinancialDashboard()
+                            FinancialDashboard(navHostController = navHostController)
                         }
                     }
                 }
