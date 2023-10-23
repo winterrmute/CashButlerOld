@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.core.text.isDigitsOnly
 import arrow.core.Option
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.input.LabeledInputField
@@ -66,16 +65,15 @@ private fun innerRecordEntryPanel(
         LabeledInputField(
             label = "Title",
             value = title,
-            onValueChange = {
-
-                title = it
-            },
+            onValueChange = { title = it },
             errorMessage = titleErrorMessage
         )
         LabeledInputField(
             label = "Amount",
             value = amount,
-            onValueChange = { amount = it },
+            onValueChange = {
+                amount = it
+            },
             errorMessage = amountErrorMessage
         )
 
@@ -84,15 +82,24 @@ private fun innerRecordEntryPanel(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             AddButton {
+                var hasError = false
+
                 if (title.isEmpty()) {
                     titleErrorMessage = "Title must not be empty"
+                    hasError = true
                 }
 
                 if (amount.isEmpty()) {
                     amountErrorMessage = "Amount must not be empty"
+                    hasError = true
                 }
 
-                if (title.isNotEmpty() && amount.isNotEmpty()) {
+                if (checkInputForCorrectFormat(amount)) {
+                    amountErrorMessage = "Invalid amount format. Example for allowed format: 10.50 or 10,50"
+                    hasError = true
+                }
+
+                if (!hasError) {
                     record.fold(
                         ifEmpty = {
                             onConfirm(
@@ -116,26 +123,28 @@ private fun innerRecordEntryPanel(
     }
 }
 
-fun sanitizeToMoneyFormat(input: String): BigDecimal {
-    // Check if the input is already in money format
-    val regex = Regex("^\\$?([1-9]\\d{0,2}(,\\d{3})*|0)(\\.\\d{2})?$")
-    if (input.matches(regex)) {
-        return BigDecimal(input.replace(",",".")) // Return the input if it's already in money format
-    }
+private fun checkInputForCorrectFormat(input: String): Boolean {
+    val pattern = Regex("[0-9]+([.,][0-9]+)?")
+    return !input.matches(pattern)
+}
 
-    // If not, sanitize the input to the money format
-    var sanitizedInput = input.replace(Regex("[^\\d.]"), "") // Remove non-digit and non-decimal point characters
+fun sanitizeToMoneyFormat(input: String): BigDecimal {
+
+    var result = input
 
     // Add "00" if the string is a whole number
-    if (!sanitizedInput.contains(".")) {
-        sanitizedInput += ".00"
+    if (!result.contains(".")) {
+        result += ".00"
     }
 
     // Round to two decimal places if the input is longer
-    val amount = BigDecimal(sanitizedInput).setScale(2, BigDecimal.ROUND_HALF_EVEN) // Set scale to 2 decimal places
+    val amount = BigDecimal(result).setScale(
+        2,
+        BigDecimal.ROUND_DOWN
+    ) // Set scale to 2 decimal places
 
     // Convert the amount to money format
-    val decimal =  DecimalFormat("#,##0.00").format(amount)
+    val decimal = DecimalFormat("#,##0.00").format(amount)
 
-    return BigDecimal(decimal.replace(",","."))
+    return BigDecimal(decimal.replace(",", "."))
 }
