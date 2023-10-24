@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.sp
+import arrow.core.Option
 
 /**
  * Represents an input field with a label.
@@ -32,14 +33,23 @@ fun LabeledInputField(
     label: String,
     value: String = "",
     onValueChange: (String) -> Unit = {},
-    errorMessage: String
+    errorMessage: Option<String>
 ) {
     var text by remember { mutableStateOf(TextFieldValue(value)) }
     var color by remember { mutableStateOf(Color.Black) }
+    var errMessage by remember { mutableStateOf("") }
 
-    if (errorMessage.isNotBlank()) {
-        color = Color.Red
-    }
+    errorMessage.fold(
+        ifEmpty = {
+            color = Color.Black
+            errMessage = ""
+        },
+        ifSome = {
+            color = Color.Red
+            errMessage = it
+        }
+    )
+
 
     Column(
         modifier = Modifier
@@ -62,7 +72,7 @@ fun LabeledInputField(
             )
         }
         Text(
-            text = errorMessage,
+            text = errMessage,
             style = androidx.compose.ui.text.TextStyle(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,

@@ -1,8 +1,6 @@
 package com.wintermute.mobile.cashbutler.presentation.view.finance.wizard
 
 import android.content.Context
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,12 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import arrow.core.const
 import com.wintermute.mobile.cashbutler.R
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialCategory
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
-import com.wintermute.mobile.cashbutler.presentation.intent.FinancialRecordIntent
-import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDataState
+import com.wintermute.mobile.cashbutler.presentation.intent.FinancialActionIntent
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.state.finance.FinancialDataState
 import com.wintermute.mobile.cashbutler.presentation.view.DialogWindow
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.HeaderTitle
 import com.wintermute.mobile.cashbutler.presentation.view.components.finance.FinancialCategoryCard
@@ -66,7 +63,7 @@ fun IncomeView(
                             categoryDetailViewVisible = true
                         },
                         onDeleteClick = {
-                            vm.processIntent(FinancialRecordIntent.RemoveCategory(it.category))
+                            vm.processIntent(FinancialActionIntent.RemoveCategory(it.category))
                         }
                     )
                 }
@@ -77,13 +74,13 @@ fun IncomeView(
                         data = state.financialRecords.first { it.category.id == currentCategory!!.id }.records,
                         onDismiss = { categoryDetailViewVisible = false },
                         onAdd = {
-                            vm.processIntent(FinancialRecordIntent.AddRecord(record = it))
+                            vm.processIntent(FinancialActionIntent.AddRecord(record = it))
                         },
                         onUpdate = {
-                            vm.processIntent(FinancialRecordIntent.UpdateRecord(record = it))
+                            vm.processIntent(FinancialActionIntent.UpdateRecord(record = it))
                         },
                         onDelete = {
-                            vm.processIntent(FinancialRecordIntent.RemoveRecord(record = it))
+                            vm.processIntent(FinancialActionIntent.RemoveRecord(record = it))
                         }
                     )
                 }
@@ -106,7 +103,7 @@ fun IncomeView(
                             selectedItems.forEach {
                                 if (state.financialRecords.none { r -> r.category.name == it }) {
                                     vm.processIntent(
-                                        FinancialRecordIntent.AddFinanceCategory(
+                                        FinancialActionIntent.AddFinanceCategory(
                                             FinancialCategory(name = it, parent = 1L)
                                         )
                                     )
@@ -115,7 +112,7 @@ fun IncomeView(
 
                             state.financialRecords.forEach {
                                 if (!selectedItems.contains(it.category.name)) {
-                                    vm.processIntent(FinancialRecordIntent.RemoveCategory(it.category))
+                                    vm.processIntent(FinancialActionIntent.RemoveCategory(it.category))
                                 }
                             }
                             recordsDialogVisible = false

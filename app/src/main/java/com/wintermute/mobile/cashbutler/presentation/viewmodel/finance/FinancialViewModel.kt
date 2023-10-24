@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.wintermute.mobile.cashbutler.data.FinancialDataRepository
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
 import com.wintermute.mobile.cashbutler.domain.finance.FinancialCategories
-import com.wintermute.mobile.cashbutler.presentation.intent.FinancialRecordIntent
-import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDataState
-import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDataState.Initialized
+import com.wintermute.mobile.cashbutler.presentation.intent.FinancialActionIntent
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.state.finance.FinancialDataState
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.state.finance.FinancialDataState.Initialized
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -62,43 +62,43 @@ abstract class FinancialViewModel(
     }
 
 
-    override fun processIntent(intent: FinancialRecordIntent) {
+    override fun processIntent(intent: FinancialActionIntent) {
         when (intent) {
-            is FinancialRecordIntent.AddRecord -> {
+            is FinancialActionIntent.AddRecord -> {
                 addRecord(intent)
             }
 
-            is FinancialRecordIntent.UpdateRecord -> {
+            is FinancialActionIntent.UpdateRecord -> {
                 updateRecord(intent)
             }
 
-            is FinancialRecordIntent.RemoveRecord -> {
+            is FinancialActionIntent.RemoveRecord -> {
                 removeRecord(intent)
             }
 
-            is FinancialRecordIntent.AddFinanceCategory -> {
+            is FinancialActionIntent.AddFinanceCategory -> {
                 addCategory(intent)
             }
 
-            is FinancialRecordIntent.RemoveCategory -> {
+            is FinancialActionIntent.RemoveCategory -> {
                 removeCategory(intent)
             }
 
         }
     }
 
-    override fun addCategory(intent: FinancialRecordIntent.AddFinanceCategory) {
+    override fun addCategory(intent: FinancialActionIntent.AddFinanceCategory) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.storeCategory(category = intent.category)
         }
     }
 
 
-    override fun removeCategory(intent: FinancialRecordIntent.RemoveCategory) {
+    override fun removeCategory(intent: FinancialActionIntent.RemoveCategory) {
         viewModelScope.launch(Dispatchers.IO) { repository.removeCategory(intent.category) }
     }
 
-    override fun addRecord(intent: FinancialRecordIntent.AddRecord) {
+    override fun addRecord(intent: FinancialActionIntent.AddRecord) {
         var newRecord = FinancialRecord(
             title = intent.record.title,
             amount = intent.record.amount,
@@ -111,13 +111,13 @@ abstract class FinancialViewModel(
         }
     }
 
-    override fun updateRecord(intent: FinancialRecordIntent.UpdateRecord) {
+    override fun updateRecord(intent: FinancialActionIntent.UpdateRecord) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateRecord(record = intent.record)
         }
     }
 
-    override fun removeRecord(intent: FinancialRecordIntent.RemoveRecord) {
+    override fun removeRecord(intent: FinancialActionIntent.RemoveRecord) {
         viewModelScope.launch(Dispatchers.IO) { repository.removeRecord(intent.record) }
     }
 }

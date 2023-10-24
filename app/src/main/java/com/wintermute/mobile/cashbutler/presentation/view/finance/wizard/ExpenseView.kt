@@ -19,8 +19,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.wintermute.mobile.cashbutler.R
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialCategory
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
-import com.wintermute.mobile.cashbutler.presentation.intent.FinancialRecordIntent
-import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDataState
+import com.wintermute.mobile.cashbutler.presentation.intent.FinancialActionIntent
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.state.finance.FinancialDataState
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.HeaderTitle
 import com.wintermute.mobile.cashbutler.presentation.view.components.finance.FinancialCategoryCard
 import com.wintermute.mobile.cashbutler.presentation.view.components.ui.AddButton
@@ -61,7 +61,7 @@ fun ExpenseView(
                             categoryDetailViewVisible = true
                         },
                         onDeleteClick = {
-                            vm.processIntent(FinancialRecordIntent.RemoveCategory(it.category))
+                            vm.processIntent(FinancialActionIntent.RemoveCategory(it.category))
                         }
                     )
                 }
@@ -72,12 +72,12 @@ fun ExpenseView(
                         data = state.financialRecords.first { it.category.id == currentCategory!!.id }.records,
                         onDismiss = { categoryDetailViewVisible = false },
                         onAdd = {
-                            vm.processIntent(FinancialRecordIntent.AddRecord(record = it))
+                            vm.processIntent(FinancialActionIntent.AddRecord(record = it))
                         },
                         onUpdate = {
                         },
                         onDelete = {
-                            vm.processIntent(FinancialRecordIntent.RemoveRecord(record = it))
+                            vm.processIntent(FinancialActionIntent.RemoveRecord(record = it))
                         }
                     )
                 }

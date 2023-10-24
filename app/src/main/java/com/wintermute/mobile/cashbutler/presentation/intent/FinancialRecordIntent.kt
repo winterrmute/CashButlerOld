@@ -1,47 +1,42 @@
 package com.wintermute.mobile.cashbutler.presentation.intent
 
-import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialCategory
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
 
-
 /**
- * Defines user actions which can be dispatched to update the logic state.
+ * Intent aggregation for creating/editing financial records.
  *
  * @author k.kosinski
  */
-sealed class FinancialRecordIntent {
-    /**
-     * Intent creating new finance category
-     *
-     * @param category financial category
-     */
-    data class AddFinanceCategory(val category: FinancialCategory) : FinancialRecordIntent()
+sealed class FinancialRecordIntent : IntentActivity {
 
     /**
-     * Intent removing a financial category
+     * Updating the text field for title
      *
-     * @param category target to remove
+     * @param title of record
      */
-    class RemoveCategory(val category: FinancialCategory) : FinancialRecordIntent()
+    data class UpdateTitleField(val title: String): FinancialRecordIntent()
 
     /**
-     * Intent creating new financial record inside category
+     * Updating the text field for amount
      *
-     * @param record target to persist
+     * @param amount of record
      */
-    data class AddRecord(val record: FinancialRecord) : FinancialRecordIntent()
+    data class UpdateAmountField(val amount: String): FinancialRecordIntent()
 
     /**
-     * Intent updating existing financial record
+     * Passing the existing record to edit to the state in view model
      *
-     * @param record target to persist
+     * @param record to be edited.
      */
-    data class UpdateRecord(val record: FinancialRecord) : FinancialRecordIntent()
+    data class PassFinancialRecord(val record: FinancialRecord): FinancialRecordIntent()
 
     /**
-     * Intent removing a financial record
-     *
-     * @param record target record to remove
+     * Intent to trigger check for valid formats and sanitizing the user input.
      */
-    class RemoveRecord(val record: FinancialRecord) : FinancialRecordIntent()
+    object PrepareFinancialRecordSubmit: FinancialRecordIntent()
+
+    /**
+     * Resetting the state.
+     */
+    object ResetState: FinancialRecordIntent()
 }

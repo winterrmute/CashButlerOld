@@ -1,24 +1,51 @@
 package com.wintermute.mobile.cashbutler.presentation.viewmodel.finance
 
-import com.wintermute.mobile.cashbutler.presentation.intent.FinancialRecordIntent
+import com.wintermute.mobile.cashbutler.presentation.intent.FinancialActionIntent
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.BaseViewModel
 
 /**
  * Defines base view model handling financial activities.
  *
  * @author k.kosinski
  */
-interface BaseFinancialViewModel {
+interface BaseFinancialViewModel : BaseViewModel<FinancialActionIntent> {
+    /**
+     * Retrieves data from source
+     */
     fun retrieveData()
 
-    fun processIntent(intent: FinancialRecordIntent)
+    /**
+     * Adding financial category for holding records related to it.
+     *
+     * @param intent: action that should be handled
+     */
+    fun addCategory(intent: FinancialActionIntent.AddFinanceCategory)
 
-    fun addCategory(intent: FinancialRecordIntent.AddFinanceCategory)
+    /**
+     * Removing financial category with all related records.
+     *
+     * @param intent: action that should be handled
+     */
+    fun removeCategory(intent: FinancialActionIntent.RemoveCategory)
 
-    fun removeCategory(intent: FinancialRecordIntent.RemoveCategory)
+    /**
+     * Adding financial record.
+     *
+     * @param intent: action that should be handled
+     */
+    fun addRecord(intent: FinancialActionIntent.AddRecord)
 
-    fun addRecord(intent: FinancialRecordIntent.AddRecord)
+    /**
+     * Updating financial record.
+     *
+     * @param intent: action that should be handled
+     */
+    fun updateRecord(intent: FinancialActionIntent.UpdateRecord)
 
-    fun updateRecord(intent: FinancialRecordIntent.UpdateRecord)
-
-    fun removeRecord(intent: FinancialRecordIntent.RemoveRecord)
+    /**
+     * Removing financial record.
+     *
+     * @param intent: action that should be handled
+     */
+    fun removeRecord(intent: FinancialActionIntent.RemoveRecord)
 }

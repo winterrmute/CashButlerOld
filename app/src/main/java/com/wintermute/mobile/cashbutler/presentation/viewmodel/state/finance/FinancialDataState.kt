@@ -1,4 +1,4 @@
-package com.wintermute.mobile.cashbutler.presentation.state.finance
+package com.wintermute.mobile.cashbutler.presentation.viewmodel.state.finance
 
 import android.icu.math.BigDecimal
 import com.wintermute.mobile.cashbutler.data.persistence.finance.CategoryWithRecords
