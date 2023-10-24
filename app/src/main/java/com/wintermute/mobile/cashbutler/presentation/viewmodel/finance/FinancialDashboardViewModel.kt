@@ -3,8 +3,8 @@ package com.wintermute.mobile.cashbutler.presentation.viewmodel.finance
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wintermute.mobile.cashbutler.data.persistence.finance.CategoryWithRecords
-import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDashboardState
-import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDataState
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.state.finance.FinancialDashboardState
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.state.finance.FinancialDataState
 import com.wintermute.mobile.cashbutler.presentation.view.components.reporting.DonutChartData
 import com.wintermute.mobile.cashbutler.presentation.view.components.reporting.DonutChartDataCollection
 import com.wintermute.mobile.cashbutler.ui.theme.charts.ChartColors

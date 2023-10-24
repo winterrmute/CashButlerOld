@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.wintermute.mobile.cashbutler.presentation.state.finance.FinancialDashboardState
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.state.finance.FinancialDashboardState
 import com.wintermute.mobile.cashbutler.presentation.view.ScreenViewNames
 import com.wintermute.mobile.cashbutler.presentation.view.components.finance.FinancialEntryDashboardCard
 import com.wintermute.mobile.cashbutler.presentation.view.components.reporting.DonutChart

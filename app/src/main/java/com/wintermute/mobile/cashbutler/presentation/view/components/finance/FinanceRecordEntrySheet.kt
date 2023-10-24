@@ -1,7 +1,5 @@
 package com.wintermute.mobile.cashbutler.presentation.view.components.finance
 
-import android.icu.math.BigDecimal
-import android.icu.text.DecimalFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,53 +7,52 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import arrow.core.Option
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
+import com.wintermute.mobile.cashbutler.presentation.intent.FinancialRecordIntent
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.input.LabeledInputField
 import com.wintermute.mobile.cashbutler.presentation.view.components.ui.AddButton
 import com.wintermute.mobile.cashbutler.presentation.view.components.ui.CancelButton
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.components.FinanceRecordEntrySheetViewModel
 
+
+/**
+ * This sheet is responsible for adding/editing financial records.
+ *
+ * @param record optional existing record in case of editing existing record
+ * @param onConfirm action that should be executed on confirm
+ * @param onDismiss instruction how to dismiss the adding process.
+ */
 @Composable
 fun FinanceRecordEntrySheet(
+    vm: FinanceRecordEntrySheetViewModel = hiltViewModel(),
     record: Option<FinancialRecord>,
     onConfirm: (record: FinancialRecord) -> Unit,
     onDismiss: () -> Unit
 ) {
-    record.fold(
-        ifEmpty = {
-            innerRecordEntryPanel(onConfirm = onConfirm, onDismiss = onDismiss)
-        },
-        ifSome = {
-            innerRecordEntryPanel(
-                record = record,
-                recordTitle = it.title,
-                recordAmount = it.amount.toString(),
-                onConfirm = onConfirm,
-                onDismiss = onDismiss,
-            )
+    var submit by remember { mutableStateOf(false) }
+    val state = vm.state.collectAsState()
+
+    record.fold(ifEmpty = {}, ifSome = {
+        vm.processIntent(FinancialRecordIntent.PassFinancialRecord(it))
+    })
+
+    //will try to submit financial record after sanitizing the inputs.
+    if (submit) {
+        if (!state.value.hasErrors) {
+            onConfirm(state.value.resultFinancialRecord)
+            vm.processIntent(FinancialRecordIntent.ResetState)
         }
-    )
-}
-
-@Composable
-private fun innerRecordEntryPanel(
-    recordTitle: String = "",
-    recordAmount: String = "",
-    onConfirm: (record: FinancialRecord) -> Unit,
-    onDismiss: () -> Unit,
-    record: Option<FinancialRecord> = Option.fromNullable(null)
-) {
-    var title by remember { mutableStateOf(recordTitle) }
-    var amount by remember { mutableStateOf(recordAmount) }
-
-    var titleErrorMessage by remember { mutableStateOf("") }
-    var amountErrorMessage by remember { mutableStateOf("") }
+        submit = false
+    }
 
     Column(
         modifier = Modifier
@@ -64,17 +61,19 @@ private fun innerRecordEntryPanel(
     ) {
         LabeledInputField(
             label = "Title",
-            value = title,
-            onValueChange = { title = it },
-            errorMessage = titleErrorMessage
+            value = state.value.title,
+            onValueChange = {
+                vm.processIntent(FinancialRecordIntent.UpdateTitleField(it))
+            },
+            errorMessage = state.value.titleErrorMessage
         )
         LabeledInputField(
             label = "Amount",
-            value = amount,
+            value = state.value.amount,
             onValueChange = {
-                amount = it
+                vm.processIntent(FinancialRecordIntent.UpdateAmountField(it))
             },
-            errorMessage = amountErrorMessage
+            errorMessage = state.value.amountErrorMessage
         )
 
         Row(
@@ -82,69 +81,13 @@ private fun innerRecordEntryPanel(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             AddButton {
-                var hasError = false
-
-                if (title.isEmpty()) {
-                    titleErrorMessage = "Title must not be empty"
-                    hasError = true
-                }
-
-                if (amount.isEmpty()) {
-                    amountErrorMessage = "Amount must not be empty"
-                    hasError = true
-                }
-
-                if (checkInputForCorrectFormat(amount)) {
-                    amountErrorMessage = "Invalid amount format. Example for allowed format: 10.50 or 10,50"
-                    hasError = true
-                }
-
-                if (!hasError) {
-                    record.fold(
-                        ifEmpty = {
-                            onConfirm(
-                                FinancialRecord(
-                                    title = title,
-                                    amount = sanitizeToMoneyFormat(amount),
-                                    category = -1L
-                                )
-                            )
-                        },
-                        ifSome = {
-                            onConfirm(it.copy(title = title, amount = BigDecimal(amount)))
-                        }
-                    )
-                }
+                vm.processIntent(FinancialRecordIntent.PrepareFinancialRecordSubmit)
+                submit = true
             }
             CancelButton {
+                vm.processIntent(FinancialRecordIntent.ResetState)
                 onDismiss()
             }
         }
     }
-}
-
-private fun checkInputForCorrectFormat(input: String): Boolean {
-    val pattern = Regex("[0-9]+([.,][0-9]+)?")
-    return !input.matches(pattern)
-}
-
-fun sanitizeToMoneyFormat(input: String): BigDecimal {
-
-    var result = input
-
-    // Add "00" if the string is a whole number
-    if (!result.contains(".")) {
-        result += ".00"
-    }
-
-    // Round to two decimal places if the input is longer
-    val amount = BigDecimal(result).setScale(
-        2,
-        BigDecimal.ROUND_DOWN
-    ) // Set scale to 2 decimal places
-
-    // Convert the amount to money format
-    val decimal = DecimalFormat("#,##0.00").format(amount)
-
-    return BigDecimal(decimal.replace(",", "."))
 }
