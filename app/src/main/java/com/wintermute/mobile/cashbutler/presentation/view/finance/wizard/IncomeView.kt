@@ -19,15 +19,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.wintermute.mobile.cashbutler.R
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialCategory
 import com.wintermute.mobile.cashbutler.data.persistence.finance.FinancialRecord
+import com.wintermute.mobile.cashbutler.domain.finance.FinancialCategories
 import com.wintermute.mobile.cashbutler.presentation.intent.FinancialActionIntent
-import com.wintermute.mobile.cashbutler.presentation.viewmodel.state.finance.FinancialDataState
-import com.wintermute.mobile.cashbutler.presentation.view.DialogWindow
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.HeaderTitle
 import com.wintermute.mobile.cashbutler.presentation.view.components.finance.FinancialCategoryCard
 import com.wintermute.mobile.cashbutler.presentation.view.components.ui.AddButton
 import com.wintermute.mobile.cashbutler.presentation.view.finance.FinanceRecordPanel
-import com.wintermute.mobile.cashbutler.presentation.view.finance.IncomeResourcesDialog
+import com.wintermute.mobile.cashbutler.presentation.view.finance.FinancialCategorySelectionDialog
 import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.BudgetViewModel
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.state.finance.FinancialDataState
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Composable
@@ -53,6 +53,9 @@ fun IncomeView(
 
         when (val state = recordsState) {
             is FinancialDataState.Initialized -> {
+                var selectedItems by remember { mutableStateOf(state.financialRecords.map { it.category.name }) }
+
+
                 state.financialRecords.forEach {
                     FinancialCategoryCard(
                         title = it.category.name,
@@ -64,6 +67,7 @@ fun IncomeView(
                         },
                         onDeleteClick = {
                             vm.processIntent(FinancialActionIntent.RemoveCategory(it.category))
+                            selectedItems = selectedItems.filter { item -> it.category.name != item }
                         }
                     )
                 }
@@ -90,20 +94,18 @@ fun IncomeView(
                 }
 
                 if (recordsDialogVisible) {
-                    var selectedItems by remember { mutableStateOf(state.financialRecords.map { it.category.name }) }
-                    DialogWindow(
-                        content = {
-                            IncomeResourcesDialog(
-                                incomeResources = state.financialRecords,
-                                onItemSelected = {
-                                    selectedItems = it
-                                })
-                        },
-                        onConfirm = {
+                    FinancialCategorySelectionDialog(
+                        category = FinancialCategories.BUDGET,
+                        currentlySelectedItems = selectedItems,
+                        onConfirm = { result ->
+                            recordsDialogVisible = false
+                            selectedItems = result
+
                             selectedItems.forEach {
                                 if (state.financialRecords.none { r -> r.category.name == it }) {
                                     vm.processIntent(
                                         FinancialActionIntent.AddFinanceCategory(
+                                            //TODO: change parent id to dynamic value
                                             FinancialCategory(name = it, parent = 1L)
                                         )
                                     )
@@ -115,11 +117,8 @@ fun IncomeView(
                                     vm.processIntent(FinancialActionIntent.RemoveCategory(it.category))
                                 }
                             }
-                            recordsDialogVisible = false
                         },
-                        onDismiss = {
-                            recordsDialogVisible = false
-                        }
+                        onDismiss = { recordsDialogVisible = false }
                     )
                 }
             }

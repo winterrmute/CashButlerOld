@@ -9,14 +9,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import com.wintermute.mobile.cashbutler.presentation.view.components.core.model.CheckBoxTextItemModel
 
 @Composable
 fun CheckBoxTextItem(
-    title: String,
-    isSelected: Boolean = false,
+    item: CheckBoxTextItemModel,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    var checked by remember { mutableStateOf(isSelected) }
+    var checked by remember { mutableStateOf(item.isChecked) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -27,6 +27,6 @@ fun CheckBoxTextItem(
                 checked = it
                 onCheckedChange(checked)
             })
-        Text(text = title)
+        Text(text = item.title)
     }
 }
