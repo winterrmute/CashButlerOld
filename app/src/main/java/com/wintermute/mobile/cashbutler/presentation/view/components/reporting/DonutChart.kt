@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +36,8 @@ data class DonutChartDataCollection(
     var items: List<DonutChartData>
 ) {
     internal var totalAmount: Float = items.sumOf {
-        it.amount.toDouble() }.toFloat()
+        it.amount.toDouble()
+    }.toFloat()
         private set
 }
 

@@ -25,8 +25,10 @@
     <string name="button_save">SAVE</string>
     <string name="button_cancel">CANCEL</string>
 
-    <!--  FINANCIAL_RECORD_SHEET_ERROR_MESSAGES  -->
-    <string name="financial_record_sheet_title_empty">Title must not be empty</string>
-    <string name="financial_record_sheet_amount_empty">Amount must not be empty</string>
-    <string name="financial_record_sheet_amount_invalid_format">Invalid amount format. Example for allowed format: 10.50 or 10,50</string>
+    <!--  TRANSACTION_SHEET_ERROR_MESSAGES  -->
+    <string name="transaction_sheet_title_empty">Title must not be empty</string>
+    <string name="transaction_sheet_amount_empty">Amount must not be empty</string>
+    <string name="transaction_sheet_amount_invalid_format">Invalid amount format. Example for allowed format: 10.50 or 10,50</string>
+    <string name="transaction_sheet_date_empty">Date must not be empty</string>
+    <string name="transaction_sheet_description_empty">Description must not be empty</string>
 </resources>

@@ -13,7 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.wintermute.mobile.cashbutler.presentation.view.ScreenViewNames
-import com.wintermute.mobile.cashbutler.presentation.view.finance.FinancialDashboard
+import com.wintermute.mobile.cashbutler.presentation.view.finance.CashFlowView
 import com.wintermute.mobile.cashbutler.presentation.view.finance.wizard.FinancialProfileWizardView
 import com.wintermute.mobile.cashbutler.ui.theme.CashButlerTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,19 +32,22 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(
                         navController = navHostController,
-                        startDestination = ScreenViewNames.DASHBOARD.name,
+                        startDestination = ScreenViewNames.CASH_FLOW.name,
                     ) {
                         composable(
                             route = "${ScreenViewNames.WIZARD.name}/{page}",
-                            arguments = listOf(navArgument("page") {type = NavType.IntType})
+                            arguments = listOf(navArgument("page") { type = NavType.IntType })
                         ) {
                             val desiredPage = it.arguments?.getInt("page") ?: 0
                             FinancialProfileWizardView(
                                 navHostController = navHostController,
-                                page = desiredPage)
+                                page = desiredPage
+                            )
                         }
                         composable(ScreenViewNames.DASHBOARD.name) {
-                            FinancialDashboard(navHostController = navHostController)
+                        }
+                        composable(ScreenViewNames.CASH_FLOW.name) {
+                            CashFlowView()
                         }
                     }
                 }

@@ -10,7 +10,7 @@ import com.wintermute.mobile.cashbutler.presentation.intent.IntentActivity
 interface BaseViewModel<T : IntentActivity> {
 
     /**
-     * Takes an Intent from IntentActivity and processes it.
+     * Responds to user action and processes it.
      *
      * @param intent action to be processed.
      */

@@ -30,14 +30,13 @@ fun FinancialCategoryCard(
 ) {
     Box(
         modifier = Modifier
-            .padding(8.dp)
             .fillMaxWidth()
-            .shadow(4.dp, shape = RoundedCornerShape(8.dp))
-            .background(color = Color.White, shape = RoundedCornerShape(8.dp))
+            .shadow(4.dp)
+            .background(color = Color.White)
             .clickable { onClick() }
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(10.dp)
         ) {
             Row {
                 Box(modifier = Modifier.weight(0.9f)) {

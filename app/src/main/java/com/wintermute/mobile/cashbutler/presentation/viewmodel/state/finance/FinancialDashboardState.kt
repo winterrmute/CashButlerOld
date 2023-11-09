@@ -13,5 +13,6 @@ sealed class FinancialDashboardState {
         val expensesData: DonutChartDataCollection,
         val balanceData: DonutChartDataCollection
     ) : FinancialDashboardState()
-    data class Error(val errorMessage: String): FinancialDashboardState()
+
+    data class Error(val errorMessage: String) : FinancialDashboardState()
 }

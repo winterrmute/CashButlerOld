@@ -11,24 +11,16 @@ import com.wintermute.mobile.cashbutler.presentation.view.components.core.model.
 @Composable
 fun CheckBoxItemsList(
     items: List<CheckBoxTextItemModel>,
-    onItemSelected: (List<String>) -> Unit
+    onItemSelected: (CheckBoxTextItemModel) -> Unit
 ) {
-    var selectedItems by remember { mutableStateOf(items.filter { it.isChecked }.map { it.title }) }
-
-
     Column {
         items.forEach {
             CheckBoxTextItem(
                 title = it.title,
                 isSelected = it.isChecked,
-                onCheckedChange = { isChecked ->
-                    selectedItems = if (isChecked) {
-                        selectedItems + it.title
-                    } else {
-                        selectedItems - it.title
-                    }
+                onCheckedChange = { newState ->
+                    onItemSelected(CheckBoxTextItemModel(title = it.title, isChecked = newState))
                 })
         }
-        onItemSelected(selectedItems)
     }
 }

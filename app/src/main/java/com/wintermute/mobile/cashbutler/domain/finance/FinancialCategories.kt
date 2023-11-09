@@ -6,6 +6,7 @@ package com.wintermute.mobile.cashbutler.domain.finance
  * @author k.kosinski
  */
 enum class FinancialCategories(val displayName: String) {
-    BUDGET("Budget"),
+    CASH_FLOW("Cash Flow"),
+    SAVINGS("Savings"),
     EXPENSES("Expenses")
 }

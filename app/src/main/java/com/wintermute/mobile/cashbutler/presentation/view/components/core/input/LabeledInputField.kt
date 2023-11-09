@@ -31,11 +31,10 @@ import arrow.core.Option
 fun LabeledInputField(
     modifier: Modifier = Modifier,
     label: String,
-    value: String = "",
+    value: String,
     onValueChange: (String) -> Unit = {},
     errorMessage: Option<String>
 ) {
-    var text by remember { mutableStateOf(TextFieldValue(value)) }
     var color by remember { mutableStateOf(Color.Black) }
     var errMessage by remember { mutableStateOf("") }
 
@@ -60,10 +59,9 @@ fun LabeledInputField(
         Row {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = text,
+                value = value,
                 onValueChange = {
-                    text = it
-                    onValueChange(it.text)
+                    onValueChange(it)
                 },
                 label = { Text(label) },
                 colors = TextFieldDefaults.outlinedTextFieldColors(

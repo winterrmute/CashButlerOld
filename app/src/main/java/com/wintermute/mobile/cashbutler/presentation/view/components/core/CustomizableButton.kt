@@ -8,13 +8,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CustomizableButton(buttonColor: Color = Color.Black, value: String, onClick: () -> Unit) {
+fun CustomizableButton(
+    modifier: Modifier = Modifier,
+    buttonColor: Color = Color.Black,
+    value: String,
+    onClick: () -> Unit
+) {
     Button(
-        modifier = Modifier.padding(5.dp),
+        modifier = Modifier.padding(5.dp).then(modifier),
         onClick = {
             onClick()
         },

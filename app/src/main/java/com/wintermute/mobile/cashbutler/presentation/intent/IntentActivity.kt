@@ -1,7 +1,7 @@
 package com.wintermute.mobile.cashbutler.presentation.intent
 
 /**
- * Base contract for user intent activities.
+ * Marker interface for user intent activities.
  *
  * @author k.kosinski
  */

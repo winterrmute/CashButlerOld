@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.wintermute.mobile.cashbutler.presentation.view.ScreenViewNames
+import com.wintermute.mobile.cashbutler.presentation.view.finance.CashFlowView
 
 @Composable
 fun FinancialProfileWizardView(
@@ -46,7 +47,7 @@ fun FinancialProfileWizardView(
                 .fillMaxSize()
         ) {
             when (currentPage) {
-                WizardSteps.BUDGET.ordinal -> IncomeView()
+                WizardSteps.CASH_FLOW.ordinal -> CashFlowView()
                 WizardSteps.EXPENSES.ordinal -> ExpenseView()
                 WizardSteps.FINANCIAL_GOALS.ordinal -> FinancialGoalsView {
                     navHostController.navigate(ScreenViewNames.DASHBOARD.name)

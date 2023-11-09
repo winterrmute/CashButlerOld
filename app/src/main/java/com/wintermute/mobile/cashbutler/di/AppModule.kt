@@ -3,11 +3,9 @@ package com.wintermute.mobile.cashbutler.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
-import com.wintermute.mobile.cashbutler.data.FinancialDataRepository
 import com.wintermute.mobile.cashbutler.data.persistence.AppDatabase
-import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.BudgetViewModel
-import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.ExpensesViewModel
-import com.wintermute.mobile.cashbutler.presentation.viewmodel.finance.FinancialViewModel
+import com.wintermute.mobile.cashbutler.data.repository.CashFlowRepository
+import com.wintermute.mobile.cashbutler.data.repository.FinancialDaoComposite
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,21 +33,6 @@ class AppModule {
     ).createFromAsset("sqlite.db")
         .build()
 
-    @Provides
-    fun provideBudgetViewModel(db: AppDatabase): BudgetViewModel {
-        return BudgetViewModel(provideFinancialDataRepository(db))
-    }
-
-    @Provides
-    fun provideExpenseViewModel(db: AppDatabase): ExpensesViewModel {
-        return ExpensesViewModel(provideFinancialDataRepository(db))
-    }
-
-    @Provides
-    fun provideFinancialCategoryDao(db: AppDatabase) = db.financialCategoryDao()
-
-    @Provides
-    fun provideFinancialRecordDao(db: AppDatabase) = db.financialRecordDao()
 
     @Provides
     @Singleton
@@ -58,11 +41,43 @@ class AppModule {
     }
 
     @Provides
+    fun provideFinancialDataCompositeDao(db: AppDatabase) = db.financeDataCompositeDao()
+
+    @Provides
+    fun provideAccountDao(db: AppDatabase) = db.accountDao()
+
+    @Provides
+    fun provideCashFlowDao(db: AppDatabase) = db.cashFlowDao()
+
+
+    @Provides
+    fun provideExpenseDao(db: AppDatabase) = db.expenseDao()
+
+
+    @Provides
+    fun provideFinancialCategoryDao(db: AppDatabase) = db.financialCategoryDao()
+
+
+    @Provides
+    fun provideSavingsDao(db: AppDatabase) = db.savingsDao()
+
+    @Provides
+    fun provideFinancialDaoComposite(db: AppDatabase): FinancialDaoComposite {
+        return FinancialDaoComposite(
+            financialCategoryDao = db.financialCategoryDao(),
+            accountDao = db.accountDao(),
+        )
+    }
+
+    @Provides
     @Singleton
-    fun provideFinancialDataRepository(db: AppDatabase): FinancialDataRepository {
-        return FinancialDataRepository(
-            categoryDao = db.financialCategoryDao(),
-            recordDao = db.financialRecordDao()
+    fun provideCashFlowRepository(db: AppDatabase): CashFlowRepository {
+        return CashFlowRepository(
+            db.cashFlowDao(),
+            FinancialDaoComposite(
+                db.financialCategoryDao(),
+                db.accountDao(),
+            )
         )
     }
 }
