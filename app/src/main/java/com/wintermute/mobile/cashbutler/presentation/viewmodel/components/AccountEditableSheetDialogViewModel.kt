@@ -37,9 +37,11 @@ class AccountEditableSheetDialogViewModel @Inject constructor() : ViewModel(),
                 val viewItems = intent.proposedItems.map {
                     RadioButtonTextItemModel(id = it.id, title = it.title)
                 }.toMutableList()
-                viewItems.add(
-                    RadioButtonTextItemModel(id = UUID.randomUUID().toString(), title = "Other")
-                )
+                if (viewItems.isNotEmpty()) {
+                    viewItems.add(
+                        RadioButtonTextItemModel(id = UUID.randomUUID().toString(), title = "Other")
+                    )
+                }
 
                 _state.value = AccountEditableSheetDialogState.Initialized(
                     items = intent.proposedItems,

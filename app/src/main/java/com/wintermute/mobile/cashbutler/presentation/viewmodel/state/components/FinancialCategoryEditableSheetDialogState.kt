@@ -1,5 +1,6 @@
 package com.wintermute.mobile.cashbutler.presentation.viewmodel.state.components
 
+import arrow.core.Option
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.model.CheckBoxTextItemModel
 
 /**
@@ -23,7 +24,8 @@ sealed class FinancialCategoryEditableSheetDialogState {
      */
     data class Initialized(
         val items: List<CheckBoxTextItemModel>,
-        val result: List<CheckBoxTextItemModel> = emptyList()
+        val result: List<CheckBoxTextItemModel> = emptyList(),
+        val customItemErrorMessage: Option<String> = Option.fromNullable(null)
     ) : FinancialCategoryEditableSheetDialogState()
 
     /**

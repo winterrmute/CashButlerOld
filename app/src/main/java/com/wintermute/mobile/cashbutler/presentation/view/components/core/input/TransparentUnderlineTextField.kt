@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import arrow.core.Option
 import com.wintermute.mobile.cashbutler.ui.theme.Typography
 
 /**
@@ -33,6 +34,7 @@ import com.wintermute.mobile.cashbutler.ui.theme.Typography
 @Composable
 fun TransparentUnderlineTextField(
     modifier: Modifier = Modifier,
+    errorMessage: Option<String>,
     value: String = "",
     placeholder: String = "Input Text",
     fontSize: TextUnit = Typography.bodyLarge.fontSize,
@@ -41,10 +43,20 @@ fun TransparentUnderlineTextField(
 ) {
 
     var text by remember { mutableStateOf(value) }
+    var errMessage by remember { mutableStateOf("") }
 
     if (!enabled && text.isNotBlank()) {
         text = ""
     }
+
+    errorMessage.fold(
+        ifSome = {
+            errMessage = it
+        },
+        ifEmpty = {
+            errMessage = ""
+        }
+    )
 
     Box(
         modifier = Modifier
@@ -84,6 +96,16 @@ fun TransparentUnderlineTextField(
                     .background(Color.Gray)
                     .height(2.dp)
             )
+
+            if (errMessage.isNotBlank()) {
+                Text(
+                    text = errMessage,
+                    color = Color.Red,
+                    style = TextStyle(
+                        fontSize = fontSize
+                    )
+                )
+            }
         }
     }
 }

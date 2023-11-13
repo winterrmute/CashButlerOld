@@ -35,7 +35,6 @@ sealed class NewFinancialCategoriesIntent : IntentActivity {
      * @param id to set as identifier
      * @param title of newly created item
      */
-//    data class AddCustomItem(val item: CheckBoxTextItemModel) : NewFinancialCategoriesIntent()
     data class AddCustomItem(val id: String, val title: String) : NewFinancialCategoriesIntent()
 
     /**
@@ -52,6 +51,11 @@ sealed class NewFinancialCategoriesIntent : IntentActivity {
      * @param id unique identifier to identify the target in result's list
      */
     data class RemoveCustomItem(val id: String) : NewFinancialCategoriesIntent()
+
+    /**
+     * Triggers state validation
+     */
+    object ValidateResult : NewFinancialCategoriesIntent()
 
     object ResetState : NewFinancialCategoriesIntent()
 }

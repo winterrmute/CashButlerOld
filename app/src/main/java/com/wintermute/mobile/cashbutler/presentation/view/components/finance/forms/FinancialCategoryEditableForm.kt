@@ -53,6 +53,8 @@ fun FinancialCategoryEditableForm(
         }
 
         is FinancialCategoryEditableSheetDialogState.Initialized -> {
+            var submit by remember { mutableStateOf(false) }
+
             //custom item id is needed to locate the item in results list and modify it
             var customItemId by remember { mutableStateOf("") }
             val customItemTitle by remember {
@@ -63,9 +65,8 @@ fun FinancialCategoryEditableForm(
 
             BottomSheetDialogScaffold(
                 onConfirm = {
-                    onConfirm(state.result.map { it.title })
-                    vm.processIntent(NewFinancialCategoriesIntent.ResetState)
-                    onDismiss()
+                    submit = true
+                    vm.processIntent(NewFinancialCategoriesIntent.ValidateResult)
                 },
                 onDismiss = {
                     vm.processIntent(NewFinancialCategoriesIntent.ResetState)
@@ -99,6 +100,7 @@ fun FinancialCategoryEditableForm(
                     )
                     CheckBoxCustomTextItem(
                         isSelected = false,
+                        errorMessage = state.customItemErrorMessage,
                         onCheckedChange = { isChecked ->
                             if (isChecked) {
                                 customItemId = UUID.randomUUID().toString()
@@ -125,6 +127,19 @@ fun FinancialCategoryEditableForm(
                         }
                     )
                 }
+            }
+
+            if (submit) {
+                state.customItemErrorMessage.fold(
+                    ifEmpty = {
+                        onConfirm(state.result.map { it.title })
+                        vm.processIntent(NewFinancialCategoriesIntent.ResetState)
+                        onDismiss()
+                    },
+                    ifSome = {
+                        submit = false
+                    }
+                )
             }
         }
 

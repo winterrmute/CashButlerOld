@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import arrow.core.Option
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.input.TransparentUnderlineTextField
 
 /**
@@ -20,6 +21,7 @@ import com.wintermute.mobile.cashbutler.presentation.view.components.core.input.
 @Composable
 fun CheckBoxCustomTextItem(
     isSelected: Boolean,
+    errorMessage: Option<String>,
     onCheckedChange: (Boolean) -> Unit,
     onValueChange: (String) -> Unit
 ) {
@@ -35,6 +37,7 @@ fun CheckBoxCustomTextItem(
 
         TransparentUnderlineTextField(
             enabled = checked,
+            errorMessage = errorMessage,
             onValueChange = onValueChange,
             placeholder = "Other"
         )

@@ -1,6 +1,7 @@
 package com.wintermute.mobile.cashbutler.presentation.viewmodel.components
 
 import androidx.lifecycle.ViewModel
+import arrow.core.Option
 import com.wintermute.mobile.cashbutler.presentation.intent.NewFinancialCategoriesIntent
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.model.CheckBoxTextItemModel
 import com.wintermute.mobile.cashbutler.presentation.viewmodel.BaseViewModel
@@ -21,7 +22,9 @@ class FinancialCategoryEditableSheetDialogViewModel @Inject constructor(
 ) : ViewModel(), BaseViewModel<NewFinancialCategoriesIntent> {
 
     private val _state =
-        MutableStateFlow<FinancialCategoryEditableSheetDialogState>(FinancialCategoryEditableSheetDialogState.Uninitialized)
+        MutableStateFlow<FinancialCategoryEditableSheetDialogState>(
+            FinancialCategoryEditableSheetDialogState.Uninitialized
+        )
     val state: StateFlow<FinancialCategoryEditableSheetDialogState> = _state
 
     override fun processIntent(intent: NewFinancialCategoriesIntent) {
@@ -53,7 +56,29 @@ class FinancialCategoryEditableSheetDialogViewModel @Inject constructor(
             is NewFinancialCategoriesIntent.RemoveCustomItem -> {
                 removeCustomItem(intent.id)
             }
+
+            NewFinancialCategoriesIntent.ValidateResult -> {
+                validateResult()
+            }
         }
+    }
+
+    /**
+     * Checks if the custom item's title is empty and if yes, provides an error message to the user.
+     */
+    private fun validateResult() {
+        val state = _state.value as FinancialCategoryEditableSheetDialogState.Initialized
+        val result = state.result.filter { it.title.isBlank() }.toList()
+
+        val errorMessage: String? = if (result.isEmpty()) {
+            null
+        } else {
+            "Title of this item may not be empty"
+        }
+
+        _state.value = state.copy(
+            customItemErrorMessage = Option.fromNullable(errorMessage)
+        )
     }
 
     /**
@@ -77,11 +102,17 @@ class FinancialCategoryEditableSheetDialogViewModel @Inject constructor(
      */
     private fun modifyCustomItem(id: String, title: String) {
         val state = _state.value as FinancialCategoryEditableSheetDialogState.Initialized
+        var errMessage = state.customItemErrorMessage
         val index = state.result.indexOfFirst { it.id == id }
         val modifiedItem = state.result[index].copy(title = title)
+
+        if (modifiedItem.title.isNotBlank() && state.customItemErrorMessage.isSome()){
+            errMessage = Option.fromNullable(null)
+        }
+
         val modifiedItemList = state.result.toMutableList()
         modifiedItemList[index] = modifiedItem
-        _state.value = state.copy(result = modifiedItemList)
+        _state.value = state.copy(result = modifiedItemList, customItemErrorMessage = errMessage)
     }
 
     /**
