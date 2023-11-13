@@ -52,6 +52,9 @@ class FinancialDataViewModel @Inject constructor(
         when (targetCategory) {
             FinancialCategories.CASH_FLOW -> {
                 viewModelScope.launch(Dispatchers.IO) {
+                    val proposedItems =
+                        repository.getProposedItemsForRootCategory(targetCategory)
+
                     repository.getCashFlowData().collect {
                         val categories =
                             it.map { categoryWithAccounts -> categoryWithAccounts.category }
@@ -72,7 +75,8 @@ class FinancialDataViewModel @Inject constructor(
                             rootCategory = FinancialCategories.CASH_FLOW,
                             categories = categories,
                             accounts = accounts,
-                            transactions = transactions
+                            transactions = transactions,
+                            proposedItems = proposedItems.data
                         )
                     }
                 }
@@ -87,7 +91,11 @@ class FinancialDataViewModel @Inject constructor(
     private fun addItem(item: FinanceDataEntity) {
         viewModelScope.launch(Dispatchers.IO) {
             when (item) {
-                is FinancialCategory -> repository.insertCategory(item)
+                is FinancialCategory -> {
+                    if ((_state.value as FinancialState.Initialized).categories.none { it.title == item.title }) {
+                        repository.insertCategory(item)
+                    }
+                }
                 is Transaction -> repository.insertTransaction(item)
                 else -> repository.addItem(item)
             }
@@ -112,5 +120,4 @@ class FinancialDataViewModel @Inject constructor(
             }
         }
     }
-
 }

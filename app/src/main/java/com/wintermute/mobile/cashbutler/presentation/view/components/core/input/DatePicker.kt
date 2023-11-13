@@ -38,14 +38,14 @@ fun DatePickerComponent(
         val selectedDate = datePickerState.selectedDateMillis?.let {
             val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.GERMAN)
             formatter.format(Date(it))
-        }
+        } ?: ""
 
         Column(modifier = Modifier.fillMaxSize()) {
             DatePickerDialog(
                 onDismissRequest = { onDismiss() },
                 confirmButton = {
                     Button(onClick = {
-                        onDateSelected(selectedDate!!)
+                        onDateSelected(selectedDate)
                         onDismiss()
                     }
 

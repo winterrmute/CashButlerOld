@@ -41,6 +41,9 @@ class AppModule {
     }
 
     @Provides
+    fun provideProposedCategoriesWithAccountsDao(db: AppDatabase) = db.proposedCategoriesAndAccountsDao()
+
+    @Provides
     fun provideFinancialDataCompositeDao(db: AppDatabase) = db.financeDataCompositeDao()
 
     @Provides
@@ -73,8 +76,9 @@ class AppModule {
     @Singleton
     fun provideCashFlowRepository(db: AppDatabase): CashFlowRepository {
         return CashFlowRepository(
-            db.cashFlowDao(),
-            FinancialDaoComposite(
+            cashFlowDao = db.cashFlowDao(),
+            proposedCategoriesAndAccountsDao = db.proposedCategoriesAndAccountsDao(),
+            financialDaoComposite = FinancialDaoComposite(
                 db.financialCategoryDao(),
                 db.accountDao(),
             )

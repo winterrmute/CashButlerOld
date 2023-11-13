@@ -2,8 +2,9 @@ package com.wintermute.mobile.cashbutler.presentation.view.components.core.model
 
 import java.util.UUID
 
+
 /**
- * Represents a data layer representation of a checkbox item with title.
+ * Represents a data layer representation of a radio button item with title.
  *
  * @param id unique identifier for localizing in item groups or lists
  * @param title item text
@@ -12,9 +13,8 @@ import java.util.UUID
  *
  * @author k.kosinski
  */
-data class CheckBoxTextItemModel(
+data class RadioButtonTextItemModel(
     val id: String = UUID.randomUUID().toString(),
     val title: String,
-    val isChecked: Boolean,
-    val isEnabled: Boolean
+    val isChecked: Boolean = false,
 )
