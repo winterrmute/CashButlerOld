@@ -1,102 +1,154 @@
 package com.wintermute.mobile.cashbutler.presentation.view.components.finance.forms
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import arrow.core.Either
+import arrow.core.Option
+import com.wintermute.mobile.cashbutler.data.persistence.finance.composite.ProposedAccount
 import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.Account
-import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.FinanceDataEntity
-import com.wintermute.mobile.cashbutler.domain.finance.FinancialCategories
-import com.wintermute.mobile.cashbutler.domain.finance.ProposedCashFlowSources
-import com.wintermute.mobile.cashbutler.domain.finance.ProposedExpenseSources
-import com.wintermute.mobile.cashbutler.domain.finance.ProposedSavingsSources
-import com.wintermute.mobile.cashbutler.presentation.intent.ProposedFinancialCategoriesIntent
-import com.wintermute.mobile.cashbutler.presentation.view.components.core.input.InputComboBox
-import com.wintermute.mobile.cashbutler.presentation.view.components.ui.AddButton
-import com.wintermute.mobile.cashbutler.presentation.view.components.ui.CancelButton
-import com.wintermute.mobile.cashbutler.presentation.viewmodel.components.ProposedFinancialCategoryDialogViewModel
-import com.wintermute.mobile.cashbutler.presentation.viewmodel.state.components.ProposedFinancialCategoryDialogState
+import com.wintermute.mobile.cashbutler.presentation.intent.NewAccountIntent
+import com.wintermute.mobile.cashbutler.presentation.view.components.core.RadioButtonTextItemGroup
+import com.wintermute.mobile.cashbutler.presentation.view.components.core.input.LabeledInputField
+import com.wintermute.mobile.cashbutler.presentation.view.components.core.model.RadioButtonTextItemModel
+import com.wintermute.mobile.cashbutler.presentation.view.components.dialog.BottomSheetDialogScaffold
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.components.AccountEditableSheetDialogViewModel
+import com.wintermute.mobile.cashbutler.presentation.viewmodel.state.components.AccountEditableSheetDialogState
 
 /**
- * TODO: Refactor me
+ * Form view for adding new accounts.
+ *
+ * @param visible
  */
 @Composable
 fun AccountsEditableForm(
-    vm: ProposedFinancialCategoryDialogViewModel = hiltViewModel(),
-    category: FinancialCategories,
-    onConfirm: (FinanceDataEntity) -> Unit,
+    vm: AccountEditableSheetDialogViewModel = hiltViewModel(),
+    proposedItems: List<ProposedAccount>,
+    onConfirm: (Either<String, Account>) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val vmState by vm.state.collectAsState();
+    val vmState by vm.state.collectAsState()
 
     when (val state = vmState) {
-        ProposedFinancialCategoryDialogState.Uninitialized -> {
-            when (category) {
-                FinancialCategories.CASH_FLOW -> {
-                    vm.processIntent(
-                        ProposedFinancialCategoriesIntent.InitState(
-                            proposedItems = enumValues<ProposedCashFlowSources>().map { it.displayName },
-                        )
-                    )
-
-                }
-
-                FinancialCategories.SAVINGS -> {
-                    vm.processIntent(
-                        ProposedFinancialCategoriesIntent.InitState(
-                            proposedItems = enumValues<ProposedSavingsSources>().map { it.displayName }
-                        )
-                    )
-                }
-
-                FinancialCategories.EXPENSES -> {
-                    vm.processIntent(
-                        ProposedFinancialCategoriesIntent.InitState(
-                            proposedItems = enumValues<ProposedExpenseSources>().map { it.displayName }
-                        )
-                    )
-                }
-            }
+        AccountEditableSheetDialogState.Uninitialized -> {
+            vm.processIntent(
+                NewAccountIntent.InitState(
+                    proposedItems = proposedItems
+                )
+            )
         }
 
-        is ProposedFinancialCategoryDialogState.Initialized -> {
+        is AccountEditableSheetDialogState.Initialized -> {
+            var submit by remember { mutableStateOf(false) }
 
-            InputComboBox(items = state.items, onItemSelected = {
-                vm.processIntent(
-                    ProposedFinancialCategoriesIntent.SetResult(
-                        Account(
-                            title = it,
-                            categoryId = 0L
-                        )
-                    )
+            if (submit) {
+                state.accountTitleErrorMessage.fold(
+                    ifEmpty = {
+                        onConfirm(state.result)
+                        vm.processIntent(NewAccountIntent.ResetState)
+                        onDismiss()
+                    },
+                    ifSome = {}
                 )
-            })
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                AddButton {
-                    state.result.fold(
-                        ifEmpty = {},
-                        ifSome = {
-                            onConfirm(it)
-                            vm.processIntent(ProposedFinancialCategoriesIntent.ResetState)
-                            onDismiss()
-                        }
-                    )
-                }
-                CancelButton {
-                    vm.processIntent(ProposedFinancialCategoriesIntent.ResetState)
+                submit = false
+            }
+
+            BottomSheetDialogScaffold(
+                onConfirm = {
+                    vm.processIntent(NewAccountIntent.ValidateResult)
+                    submit = true
+                },
+                onDismiss = {
+                    vm.processIntent(NewAccountIntent.ResetState)
                     onDismiss()
                 }
+            ) {
+                CreateAccountPanel(
+                    items = state.viewItems,
+                    currentlySelectedItem = state.selectedItemTypeIndex,
+                    accountTitle = state.accountTitle,
+                    accountTitleErrorMessage = state.accountTitleErrorMessage,
+                    accountType = state.accountType,
+                    onItemSelected = {
+                        vm.processIntent(NewAccountIntent.SelectItemType(it))
+                    },
+                    onAccountTitleChange = {
+                        vm.processIntent(NewAccountIntent.UpdateItemsTitle(it))
+                    }
+                )
             }
         }
 
-        is ProposedFinancialCategoryDialogState.Error -> {
+        is AccountEditableSheetDialogState.Error -> {
         }
+    }
+}
+
+
+@Composable
+private fun CreateAccountPanel(
+    items: List<RadioButtonTextItemModel>,
+    currentlySelectedItem: Int,
+    accountTitle: String,
+    accountTitleErrorMessage: Option<String>,
+    accountType: String,
+    onItemSelected: (String) -> Unit,
+    onAccountTitleChange: (String) -> Unit
+) {
+    Column {
+        if (currentlySelectedItem > -1 || items.isEmpty()) {
+            EditableAccountSheet(
+                accountTitle = accountTitle,
+                accountTitleErrorMessage = accountTitleErrorMessage,
+                accountType = accountType,
+                onAccountTitleChange = onAccountTitleChange
+            )
+        } else {
+            Text(
+                text = "Select account type",
+                style = TextStyle(
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            RadioButtonTextItemGroup(
+                items = items,
+                selectedItem = currentlySelectedItem,
+                onSelectedChange = onItemSelected
+            )
+        }
+    }
+}
+
+@Composable
+private fun EditableAccountSheet(
+    accountTitle: String,
+    accountTitleErrorMessage: Option<String>,
+    accountType: String,
+    onAccountTitleChange: (String) -> Unit
+) {
+    Column {
+        Text(
+            text = accountType,
+            style = TextStyle(
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+        LabeledInputField(
+            label = "Title",
+            value = accountTitle,
+            errorMessage = accountTitleErrorMessage,
+            onValueChange = onAccountTitleChange
+        )
     }
 }

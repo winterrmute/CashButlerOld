@@ -1,5 +1,6 @@
 package com.wintermute.mobile.cashbutler.presentation.viewmodel.state.finance
 
+import com.wintermute.mobile.cashbutler.data.persistence.finance.composite.ProposedCategoryWithAccounts
 import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.Account
 import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.FinancialCategory
 import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.Transaction
@@ -36,6 +37,7 @@ sealed class FinancialState {
         val rootCategory: FinancialCategories,
         val categories: List<FinancialCategory>,
         val accounts: Map<Long, List<Account>>,
-        val transactions: Map<Long, List<Transaction>>
+        val transactions: Map<Long, List<Transaction>>,
+        val proposedItems: Map<String, ProposedCategoryWithAccounts>
     ) : FinancialState()
 }

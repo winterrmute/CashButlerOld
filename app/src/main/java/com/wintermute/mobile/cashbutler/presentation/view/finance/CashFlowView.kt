@@ -9,13 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
+import arrow.core.Option
 import arrow.core.toOption
 import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.Account
 import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.FinancialCategory
@@ -24,7 +24,6 @@ import com.wintermute.mobile.cashbutler.domain.finance.FinancialCategories
 import com.wintermute.mobile.cashbutler.presentation.FinancialPanelViewPages
 import com.wintermute.mobile.cashbutler.presentation.intent.FinancialActionIntent
 import com.wintermute.mobile.cashbutler.presentation.view.components.core.HeaderNavigationElement
-import com.wintermute.mobile.cashbutler.presentation.view.components.dialog.BottomSheetDialog
 import com.wintermute.mobile.cashbutler.presentation.view.components.finance.FinancialPanelView
 import com.wintermute.mobile.cashbutler.presentation.view.components.finance.forms.AccountsEditableForm
 import com.wintermute.mobile.cashbutler.presentation.view.components.finance.forms.FinancialCategoryEditableForm
@@ -49,121 +48,147 @@ fun CashFlowView(
             var currentPanelPage by remember { mutableStateOf(FinancialPanelViewPages.CATEGORIES) }
             var showAddDialog by remember { mutableStateOf(false) }
 
-            var currentCategory by remember { mutableLongStateOf(0L) }
-            var currentAccount by remember { mutableLongStateOf(0L) }
-            var currentTransaction by remember { mutableStateOf<Transaction?>(null) }
+            var currentCategory by remember { mutableStateOf(FinancialCategory(title = "")) }
+            var currentAccount by remember { mutableStateOf(Account(title = "", categoryId = 0L)) }
+            var currentTransaction by remember {
+                mutableStateOf<Option<Transaction>>(
+                    Option.fromNullable(
+                        null
+                    )
+                )
+            }
 
-            BottomSheetDialog(
-                content = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color(245, 245, 245))
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            HeaderNavigationElement(
-                                title = FinancialCategories.CASH_FLOW.displayName,
-                                subtitle = currentPanelPage.displayName,
-                                onAddClick = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(245, 245, 245))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    HeaderNavigationElement(
+                        title = FinancialCategories.CASH_FLOW.displayName,
+                        subtitle = currentPanelPage.displayName,
+                        onAddClick = {
+                            showAddDialog = true
+                        }
+                    )
+
+                    FinancialPanelView(
+                        categories = state.categories,
+                        accountsByCategoryId = state.accounts,
+                        transactionsByAccountId = state.transactions,
+                        currentCategory = currentCategory,
+                        currentAccount = currentAccount,
+                        panelView = currentPanelPage,
+                        onItemClick = {
+                            when (it) {
+                                is FinancialCategory -> {
+                                    currentCategory = it
+                                    currentPanelPage = FinancialPanelViewPages.ACCOUNTS
+                                }
+
+                                is Account -> {
+                                    currentAccount = it
+                                    currentPanelPage = FinancialPanelViewPages.TRANSACTIONS
+                                }
+
+                                is Transaction -> {
+                                    currentTransaction = it.toOption()
                                     showAddDialog = true
                                 }
-                            )
-
-                            FinancialPanelView(
-                                categories = state.categories,
-                                accountsByCategoryId = state.accounts,
-                                transactionsByAccountId = state.transactions,
-                                currentCategory = currentCategory,
-                                currentAccount = currentAccount,
-                                panelView = currentPanelPage,
-                                onItemClick = {
-                                    when (it) {
-                                        is FinancialCategory -> {
-                                            currentCategory = it.id
-                                            currentPanelPage = FinancialPanelViewPages.ACCOUNTS
-                                        }
-
-                                        is Account -> {
-                                            currentAccount = it.id
-                                            currentPanelPage = FinancialPanelViewPages.TRANSACTIONS
-                                        }
-
-                                        is Transaction -> {
-                                            currentTransaction = it
-                                            showAddDialog = true
-                                        }
-                                    }
-                                },
-                                onItemDelete = {
-                                    vm.processIntent(FinancialActionIntent.RemoveItem(it))
-                                }
-                            )
+                            }
+                        },
+                        onItemDelete = {
+                            vm.processIntent(FinancialActionIntent.RemoveItem(it))
                         }
-                    }
-                },
-                bottomSheet = {
-                    when (currentPanelPage) {
-                        FinancialPanelViewPages.CATEGORIES -> {
-                            FinancialCategoryEditableForm(
-                                category = state.rootCategory,
-                                onConfirm = {
-                                    vm.processIntent(FinancialActionIntent.AddItem(it))
-                                    showAddDialog = false
-                                },
-                                onDismiss = { showAddDialog = false }
-                            )
-                        }
+                    )
+                }
+            }
 
-                        FinancialPanelViewPages.ACCOUNTS -> {
-                            AccountsEditableForm(
-                                category = state.rootCategory,
-                                onConfirm = {
-                                    val result = Account(
-                                        categoryId = currentCategory,
-                                        title = (it as Account).title,
-                                    )
-                                    vm.processIntent(FinancialActionIntent.AddItem(result))
-                                },
-                                onDismiss = { showAddDialog = false }
-                            )
-                        }
-
-                        FinancialPanelViewPages.TRANSACTIONS -> {
-                            TransactionEditableSheetForm(
-                                visible = showAddDialog,
-                                transaction = currentTransaction.toOption(),
-                                onConfirm = {
-                                    val transaction =
-                                        it.copy(accountId = currentAccount)
-                                    if (transaction.id > 0) {
-                                        vm.processIntent(
-                                            FinancialActionIntent.UpdateItem(
-                                                transaction
+            if (showAddDialog) {
+                when (currentPanelPage) {
+                    FinancialPanelViewPages.CATEGORIES -> {
+                        FinancialCategoryEditableForm(
+                            proposedItems = state.proposedItems.keys.toList(),
+                            ownedItems = state.categories.map { it.title },
+                            onConfirm = {
+                                it.forEach { newCategory ->
+                                    vm.processIntent(
+                                        FinancialActionIntent.AddItem(
+                                            FinancialCategory(
+                                                title = newCategory
                                             )
                                         )
-                                    } else {
-                                        vm.processIntent(FinancialActionIntent.AddItem(transaction))
-                                    }
-                                    showAddDialog = false
-                                },
-                                onDismiss = {
-                                    showAddDialog = false
+                                    )
                                 }
-                            )
-                        }
+                            },
+                            onDismiss = { showAddDialog = false }
+                        )
                     }
-                },
-                showBottomSheet = showAddDialog
-            )
+
+                    FinancialPanelViewPages.ACCOUNTS -> {
+                        AccountsEditableForm(
+                            proposedItems = state.proposedItems[currentCategory.title]?.accounts
+                                ?: emptyList(),
+                            onConfirm = { account ->
+                                account.fold(
+                                    ifLeft = {
+                                        //TODO: handle error
+                                    },
+                                    ifRight = {
+                                        val result =
+                                            it.copy(categoryId = currentCategory.id)
+                                        vm.processIntent(
+                                            FinancialActionIntent.AddItem(
+                                                result
+                                            )
+                                        )
+                                    }
+                                )
+                            },
+                            onDismiss = { showAddDialog = false }
+                        )
+                    }
+
+                    FinancialPanelViewPages.TRANSACTIONS -> {
+                        TransactionEditableSheetForm(
+                            transaction = currentTransaction,
+                            onConfirm = {
+                                val transaction =
+                                    it.copy(accountId = currentAccount.id)
+                                if (transaction.id > 0) {
+                                    vm.processIntent(
+                                        FinancialActionIntent.UpdateItem(
+                                            transaction
+                                        )
+                                    )
+                                } else {
+                                    vm.processIntent(
+                                        FinancialActionIntent.AddItem(
+                                            transaction
+                                        )
+                                    )
+                                }
+                                currentTransaction = Option.fromNullable(null)
+                                showAddDialog = false
+                            },
+                            onDismiss = {
+                                currentTransaction = Option.fromNullable(null)
+                                showAddDialog = false
+                            }
+                        )
+                    }
+                }
+            }
 
             BackHandler(showAddDialog || currentPanelPage.ordinal > 0) {
                 if (showAddDialog) {
                     showAddDialog = false
                 } else {
-                    currentPanelPage = enumValues<FinancialPanelViewPages>()[currentPanelPage.ordinal -1]
+                    currentPanelPage =
+                        enumValues<FinancialPanelViewPages>()[currentPanelPage.ordinal - 1]
                 }
             }
         }

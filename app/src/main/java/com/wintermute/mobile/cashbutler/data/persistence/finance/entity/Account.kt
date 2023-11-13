@@ -31,7 +31,7 @@ data class Account(
     override val id: Long = 0L,
 
     @ColumnInfo(name = "category_id")
-    val categoryId: Long,
+    val categoryId: Long = 0L,
 
     @ColumnInfo
     val title: String,

@@ -24,8 +24,8 @@ fun FinancialPanelView(
     categories: List<FinancialCategory>,
     accountsByCategoryId: Map<Long, List<Account>>,
     transactionsByAccountId: Map<Long, List<Transaction>>,
-    currentCategory: Long,
-    currentAccount: Long,
+    currentCategory: FinancialCategory,
+    currentAccount: Account,
     panelView: FinancialPanelViewPages,
     onItemClick: (FinanceDataEntity) -> Unit,
     onItemDelete: (FinanceDataEntity) -> Unit,
@@ -46,7 +46,7 @@ fun FinancialPanelView(
 
         FinancialPanelViewPages.ACCOUNTS -> {
             AccountsList(
-                items = accountsByCategoryId[currentCategory]!!,
+                items = accountsByCategoryId[currentCategory.id] ?: emptyList(),
                 onItemClick = {
                     onItemClick(it)
                 },
@@ -58,7 +58,7 @@ fun FinancialPanelView(
 
         FinancialPanelViewPages.TRANSACTIONS -> {
             TransactionList(
-                items = transactionsByAccountId[currentAccount] ?: emptyList(),
+                items = transactionsByAccountId[currentAccount.id] ?: emptyList(),
                 onItemClick = { onItemClick(it) },
                 onItemDelete = { onItemDelete(it) }
             )

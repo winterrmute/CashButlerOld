@@ -3,10 +3,13 @@ package com.wintermute.mobile.cashbutler.data.repository
 import com.wintermute.mobile.cashbutler.data.persistence.finance.composite.CategoryWithAccounts
 import com.wintermute.mobile.cashbutler.data.persistence.finance.dao.BaseDao
 import com.wintermute.mobile.cashbutler.data.persistence.finance.dao.CashFlowDao
+import com.wintermute.mobile.cashbutler.data.persistence.finance.dao.ProposedCategoriesAndAccountsDao
 import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.Account
 import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.FinanceDataEntity
 import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.FinancialCategory
+import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.ProposedCategoriesAndAccounts
 import com.wintermute.mobile.cashbutler.data.persistence.finance.entity.Transaction
+import com.wintermute.mobile.cashbutler.domain.finance.FinancialCategories
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
@@ -20,7 +23,8 @@ import javax.inject.Inject
  */
 class CashFlowRepository @Inject constructor(
     private val cashFlowDao: CashFlowDao,
-    private val financialDaoComposite: FinancialDaoComposite
+    private val financialDaoComposite: FinancialDaoComposite,
+    private val proposedCategoriesAndAccountsDao: ProposedCategoriesAndAccountsDao
 ) {
 
     /**
@@ -35,6 +39,15 @@ class CashFlowRepository @Inject constructor(
                 emit(result)
             }
         }
+    }
+
+    /**
+     * Get proposed items for a root category
+     *
+     * @param rootCategory for which the set of categories with related accounts should be get.
+     */
+    fun getProposedItemsForRootCategory(rootCategory: FinancialCategories): ProposedCategoriesAndAccounts {
+        return proposedCategoriesAndAccountsDao.getProposedCategoriesAndAccounts(rootCategory.displayName)
     }
 
 
@@ -71,7 +84,6 @@ class CashFlowRepository @Inject constructor(
     fun removeTransaction(transaction: Transaction) {
         cashFlowDao.removeTransactionAndModifyBalances(transaction)
     }
-
 
     /**
      * Adds an which is represents a financial data entry.
