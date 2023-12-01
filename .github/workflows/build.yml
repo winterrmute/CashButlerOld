@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: Sonarqube-check
-    runs-on: ubuntu-latest
+    runs-on: node16
     steps:
       - uses: actions/checkout@v2
         with:
