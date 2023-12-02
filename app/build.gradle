@@ -17,12 +17,6 @@ sonar {
     }
 }
 
-sonarqube {
-    properties {
-        property "sonar.androidLint.reportPaths", "build/reports/lint-report.xml"
-    }
-}
-
 android {
     namespace 'com.wintermute.mobile.cashbutler'
     compileSdk 34
@@ -67,6 +61,7 @@ android {
     lintOptions {
         abortOnError false
         textOutput 'stdout'
+        disable 'ObsoleteLintCustomCheck'
         htmlOutput file("build/reports/lint-results.html")
         xmlOutput file("build/reports/lint-results.xml")
     }
