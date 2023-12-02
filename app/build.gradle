@@ -9,7 +9,7 @@ plugins {
 
 sonar {
     properties {
-        property "sonar.projectKey", "winterrmute_CashButlerOld_AYwp9OVRBE4xrf3uP2_b"
+        property "sonar.projectKey", "winterrmute_CashButlerOld_AYwr7X5OjsJy7pEowZlD"
         property "sonar.inclusions", "**/*.kt"
         property "sonar.sources", "src/main/java"
         property "sonar.profile", "Android Lint"
