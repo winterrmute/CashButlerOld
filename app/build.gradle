@@ -10,6 +10,7 @@ plugins {
 sonar {
     properties {
         property "sonar.projectKey", "winterrmute_CashButlerOld_AYwp9OVRBE4xrf3uP2_b"
+        property "sonar.android.lint.reportPaths", "build/reports/lint-results.xml"
     }
 }
 
@@ -54,6 +55,12 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+//    lintOptions {
+//        abortOnError false
+//        textOutput 'stdout'
+//        htmlOutput file("$buildDir/reports/lint/lint-report.html")
+//        xmlOutput file("$buildDir/reports/lint/lint-report.xml")
+//    }
 }
 
 dependencies {
