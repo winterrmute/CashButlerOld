@@ -10,9 +10,12 @@ plugins {
 sonar {
     properties {
         property "sonar.projectKey", "winterrmute_CashButlerOld_AYwp9OVRBE4xrf3uP2_b"
-        property "sonar.android.lint.reportPaths", "build/reports/lint-results.xml"
+        property "sonar.sources", "src/main/java"
+        property "sonar.profile", "Android Lint"
+        property "sonar.androidLint.reportPaths", "build/reports/lint-results.xml"
     }
 }
+
 
 android {
     namespace 'com.wintermute.mobile.cashbutler'
