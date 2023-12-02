@@ -10,7 +10,7 @@ plugins {
 sonar {
     properties {
         property "sonar.projectKey", "winterrmute_CashButlerOld_AYwp9OVRBE4xrf3uP2_b"
-        property "sonar.android.lint.reportPaths", "app/build/reports/lint-results.xml"
+        property "sonar.android.lint.reportPaths", "build/reports/lint-results.xml"
     }
 }
 
@@ -58,8 +58,8 @@ android {
     lintOptions {
         abortOnError false
         textOutput 'stdout'
-            htmlOutput file("$buildDir/reports/lint-report.html")
-        xmlOutput file("$buildDir/reports/lint-report.xml")
+            htmlOutput file("build/reports/lint-results.html")
+        xmlOutput file("build/reports/lint-results.xml")
     }
 }
 
