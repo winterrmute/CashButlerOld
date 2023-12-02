@@ -38,6 +38,12 @@ fun FinancialProfileWizardView(
     var currentPage by rememberSaveable { mutableIntStateOf(page) }
     val wizardSteps = 3
 
+    val name: String? = null
+    if (name == "John") {
+        // Code
+    }
+
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
