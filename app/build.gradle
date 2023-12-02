@@ -10,6 +10,7 @@ plugins {
 sonar {
     properties {
         property "sonar.projectKey", "winterrmute_CashButlerOld_AYwp9OVRBE4xrf3uP2_b"
+        property "sonar.androidLint.reportPaths", "${project.buildDir}/reports/lint-results.xml"
     }
 }
 
