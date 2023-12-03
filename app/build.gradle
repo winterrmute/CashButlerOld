@@ -9,11 +9,13 @@ plugins {
 
 sonar {
     properties {
+
+        property "sonar.profile", "Android Lint"
         property "sonar.projectKey", "winterrmute_CashButlerOld_AYwr7X5OjsJy7pEowZlD"
         property "sonar.inclusions", "**/*.kt"
         property "sonar.sources", "src/main/java"
-        property "sonar.profile", "Android Lint"
         property "sonar.android.lint.reportPaths", "build/reports/lint-results.xml"
+        property "sonar.androidLint.reportPaths", "build/reports/lint-results.xml"
     }
 }
 
